@@ -17,9 +17,9 @@ public abstract class Player {
     public final static int SURRENDER = 4;
 
     // information of the player's cards will be stored in an ArrayList
-    private ArrayList<Card> hand;
+    protected ArrayList<Card> hand;
 
-    private int score;
+    protected int score;
 
     public Player(Card firstCard, Card secondCard) {
         hand = new ArrayList<Card>(Arrays.asList(firstCard, secondCard));
@@ -31,7 +31,7 @@ public abstract class Player {
         calculateScore();
     }
 
-    private void calculateScore() {
+    protected void calculateScore() {
         //
         boolean hasAce = false;
         int tempScore = 0;
