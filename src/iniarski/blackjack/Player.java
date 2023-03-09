@@ -21,11 +21,6 @@ public abstract class Player {
 
     protected int score;
 
-    public Player(Card firstCard, Card secondCard) {
-        hand = new ArrayList<Card>(Arrays.asList(firstCard, secondCard));
-        calculateScore();
-    }
-
     public void addCard(Card addedCard) {
         hand.add(addedCard);
         calculateScore();

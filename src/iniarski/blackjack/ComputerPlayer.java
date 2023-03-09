@@ -8,8 +8,4 @@ public class ComputerPlayer extends Player{
         return Player.STAND;
     }
 
-    // using Player() constructor
-    public ComputerPlayer(Card firstCard, Card secondCard) {
-        super(firstCard, secondCard);
-    }
 }

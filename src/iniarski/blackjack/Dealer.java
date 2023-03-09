@@ -11,8 +11,4 @@ public class Dealer extends Player{
         return Player.STAND;
     }
 
-    // using Player() constructor
-    public Dealer(Card firstCard, Card secondCard) {
-        super(firstCard, secondCard);
-    }
 }
