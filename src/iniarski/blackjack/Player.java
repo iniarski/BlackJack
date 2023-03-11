@@ -57,6 +57,13 @@ public abstract class Player {
         return score;
     }
 
+    public void printHand() {
+        for (Card card : hand) {
+            System.out.print(card + ", ");
+        }
+        System.out.println(score + " points");
+    }
+
     // play() method will be defined in inheriting classes
     // will return an int representing action taken by the player
     // (as specified in static final fields)
