@@ -59,6 +59,12 @@ public class Deck {
         Collections.shuffle(Arrays.asList(cards));
     }
 
+    public void reshuffle(){
+        onCard = 0;
+        Arrays.fill(nOfCardsLeft, deckSize / 13);
+        shuffle();
+    }
+
     public int[] getCardsLeftSimplified() {
 
         // this method returns int array containing information about the number of cards left in the deck
