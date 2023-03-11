@@ -17,7 +17,7 @@ public abstract class Player {
     public final static int SURRENDER = 4;
 
     // information of the player's cards will be stored in an ArrayList
-    protected ArrayList<Card> hand;
+    protected ArrayList<Card> hand = new ArrayList<>();
 
     protected int score;
 
