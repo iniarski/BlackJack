@@ -42,6 +42,13 @@ public class Game {
                 player.printHand();
             }
 
+            // If the player is BUST (over 21) the dealer doesn't move
+
+            if (player.getScore() > 21) {
+                System.out.println("BUST - house wins");
+                System.out.println("Player's money : " + player.getMoney() + "\n");
+            }
+
             System.out.println("Dealer move");
             dealer.addCard(deck.deal());
             dealer.printHand();
@@ -51,7 +58,7 @@ public class Game {
             }
 
             // player win condition
-            if (dealer.getScore() > 21 || (player.getScore() <= 21 && player.getScore() > dealer.getScore())) {
+            if (dealer.getScore() > 21 || player.getScore() > dealer.getScore()) {
                 System.out.println("Player wins");
                 player.winMoney(2 * playerBet);
             } else {

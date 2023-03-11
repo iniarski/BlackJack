@@ -1,7 +1,6 @@
 package iniarski.blackjack;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ComputerPlayer extends Player{
 
