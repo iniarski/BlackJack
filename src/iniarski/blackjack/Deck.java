@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class Deck {
-    final int STANDARD_DECK_SIZE = 52;
+    final private int STANDARD_DECK_SIZE = 52;
 
     private Card[] cards;
     private int deckSize;
@@ -57,5 +57,22 @@ public class Deck {
 
     void shuffle() {
         Collections.shuffle(Arrays.asList(cards));
+    }
+
+    public int[] getCardsLeftSimplified() {
+
+        // this method returns int array containing information about the number of cards left in the deck
+        int[] cardsSimplified = new int[10];
+        System.arraycopy(nOfCardsLeft, 0, cardsSimplified, 0, 9);
+
+        cardsSimplified[9] = 0;
+
+        // 10, J, Q and K are added together because they are each worth 10 points
+        // and are identical in terms of rules of the game
+        for (int i = 9; i < 12; i++) {
+            cardsSimplified[9] += nOfCardsLeft[i];
+        }
+
+        return cardsSimplified;
     }
 }
