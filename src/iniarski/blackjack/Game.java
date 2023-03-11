@@ -47,6 +47,7 @@ public class Game {
             if (player.getScore() > 21) {
                 System.out.println("BUST - house wins");
                 System.out.println("Player's money : " + player.getMoney() + "\n");
+                continue;
             }
 
             System.out.println("Dealer move");
