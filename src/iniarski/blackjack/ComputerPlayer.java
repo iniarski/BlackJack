@@ -1,5 +1,8 @@
 package iniarski.blackjack;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class ComputerPlayer extends Player{
 
 
@@ -8,9 +11,28 @@ public class ComputerPlayer extends Player{
         this.money = money;
     }
 
+
+    @Override
+    public void setHand(ArrayList<Card> hand) {
+        this.hand = hand;
+        calculateScore();
+    }
+
+    // overloading for ease of use
+    public void setHand(Card firstCard, Card secondCard) {
+        hand.clear();
+        hand.add(firstCard);
+        hand.add(secondCard);
+        calculateScore();
+    }
+
     @Override
     public int play() {
         // TODO : Implement logic
+        // as of now the computer plays the same as the dealer;
+        if (score < 17) {
+            return Player.HIT;
+        }
         return Player.STAND;
     }
 

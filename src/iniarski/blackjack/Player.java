@@ -21,10 +21,7 @@ public abstract class Player {
 
     protected int score;
 
-    public void setHand(ArrayList<Card> hand) {
-        this.hand = hand;
-        calculateScore();
-    }
+    public abstract void setHand(ArrayList <Card> hand);
 
     public void addCard(Card addedCard) {
         hand.add(addedCard);
