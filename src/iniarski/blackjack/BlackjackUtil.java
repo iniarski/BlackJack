@@ -4,7 +4,12 @@ package iniarski.blackjack;
 
 public class BlackjackUtil {
 
+    private static BlackjackUtil instance = new BlackjackUtil();
     private BlackjackUtil(){
+    }
+
+    public static BlackjackUtil getInstance() {
+        return instance;
     }
 
     public int calculateScore(int[] cardRanks) {
