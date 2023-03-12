@@ -40,7 +40,7 @@ public class Deck {
         Arrays.fill(nOfCardsLeft, 4 * nOfDecks);
     }
 
-    Card deal() {
+    public Card deal() {
         // decrementing nOfCardLeft at index of the rank of cards
         nOfCardsLeft[cards[onCard].getRank()]--;
         // changing to next card
@@ -49,7 +49,16 @@ public class Deck {
         return cards[onCard - 1];
     }
 
-    void print() {
+    public Card dealFaceDownCard() {
+        onCard++;
+        return  cards[onCard - 1];
+    }
+
+    public void revealFaceDownCard(int rank){
+        nOfCardsLeft[rank]--;
+    }
+
+    public void print() {
         for (int i = 0; i < deckSize; i++) {
             System.out.println(cards[i].toString());
         }

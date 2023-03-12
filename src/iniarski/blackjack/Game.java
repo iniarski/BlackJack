@@ -31,7 +31,7 @@ public class Game {
             player.printHand();
 
             System.out.println("Dealer : ");
-            dealer.setHand(deck.deal());
+            dealer.setHand(deck.deal(), deck.dealFaceDownCard());
             dealer.printHand();
 
             System.out.println("Player move");
@@ -51,7 +51,7 @@ public class Game {
             }
 
             System.out.println("Dealer move");
-            dealer.addCard(deck.deal());
+            deck.revealFaceDownCard(dealer.revealCard());
             dealer.printHand();
             while (dealer.play() != 0 && dealer.getScore() <= 21) {
                 dealer.addCard(deck.deal());

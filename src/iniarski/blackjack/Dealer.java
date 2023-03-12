@@ -3,6 +3,7 @@ package iniarski.blackjack;
 import java.util.ArrayList;
 
 public class Dealer extends Player{
+    private boolean hasRevealedCard;
 
     @Override
     public void setHand(ArrayList<Card> hand) {
@@ -10,11 +11,19 @@ public class Dealer extends Player{
         calculateScore();
     }
 
-    public void setHand(Card dealersCard) {
+    public void setHand(Card dealersCard, Card faceDownCard) {
         hand.clear();
         hand.add(dealersCard);
+        hand.add(faceDownCard);
+        hasRevealedCard = false;
         calculateScore();
     }
+
+    public int revealCard() {
+        hasRevealedCard = true;
+        return hand.get(1).getRank();
+    }
+
     @Override
     public int play() {
         // According to the rules of Blackjack if the dealer has score of less than 17 he has to hit
@@ -25,4 +34,12 @@ public class Dealer extends Player{
         return Player.STAND;
     }
 
+    @Override
+    public void printHand() {
+        if (hasRevealedCard) {
+            super.printHand();
+        } else {
+            System.out.println(hand.get(0) + ", face down card");
+        }
+    }
 }
