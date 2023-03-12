@@ -37,9 +37,11 @@ public class Game {
             System.out.println("Player move");
             int playerBet = player.bet(minBet, maxBet);
             System.out.println("Player's bet : " + playerBet);
+            player.calculateBestMove(deck.getCardsLeftSimplified(), dealer.getRevealedCard());
             while (player.play() != 0 && player.getScore() <= 21) {
                 player.addCard(deck.deal());
                 player.printHand();
+                player.calculateBestMove(deck.getCardsLeftSimplified(), dealer.getRevealedCard());
             }
 
             // If the player is BUST (over 21) the dealer doesn't move
