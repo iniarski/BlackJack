@@ -18,8 +18,10 @@ public class BlackjackUtil {
 
     public int calculateScore(int[] cardRanks) {
 
-        // method for calculating score
-        // works for both cards description in the form of int[10] and int[13]
+        // works for cards represented as
+        // 0 : Ace
+        // 1 - 8 : cards from 2 to 9
+        // 9 : 10, J, Q and K
 
         int score = 0;
         boolean hasAce = false;
@@ -29,11 +31,7 @@ public class BlackjackUtil {
                 hasAce = true;
             }
 
-            if (n < 10){
-                score += n + 1;
-            } else {
-                score += 10;
-            }
+            score += n + 1;
         }
 
         if(hasAce && score <= 11) {
