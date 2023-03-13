@@ -41,6 +41,10 @@ public class Game {
             while (player.play() != 0 && player.getScore() <= 21) {
                 player.addCard(deck.deal());
                 player.printHand();
+                if(player.getScore() > 21) {
+                    continue;
+                    // skipping unnecessary computation if player is busted
+                }
                 player.calculateBestMove(deck.getCardsLeftSimplified(), dealer.getRevealedCard());
             }
 
