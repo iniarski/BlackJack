@@ -78,9 +78,12 @@ public class ComputerPlayer extends Player{
         }
 
         // Temporary solution
-        // TODO :  improve logic
+        // TODO :  implement doubling-down, surrendering and splitting
 
-        double bustProbability = 0;
+        double bustProbability = 0.0;
+
+        double dealerWinProbability = BlackjackUtil.getInstance()
+                .calculateDealerChances(new int[]{dealerCardRank}, cardsLeft, score);
 
         for (int i = 0; i < 10; i++) {
             // making an array for possible hand
@@ -94,10 +97,10 @@ public class ComputerPlayer extends Player{
             }
         }
 
-        if (bustProbability > 0.5) {
-            optimalMove = STAND;
-        } else {
+        if (dealerWinProbability > bustProbability) {
             optimalMove = HIT;
+        } else {
+            optimalMove = STAND;
         }
     }
 
