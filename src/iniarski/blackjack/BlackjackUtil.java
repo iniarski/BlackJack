@@ -86,13 +86,30 @@ public class BlackjackUtil {
                     return;
                 }
 
-                int[] newDeck = cardsInDeck.clone();
-                newDeck[finalI]--;
+                // making new hand (by adding new card of specified index and checking if dealer still has play
 
                 int[] newHand = Arrays.copyOf(dealerCards, dealerCards.length + 1);
                 newHand[newHand.length - 1] = finalI;
 
+                int tempScore = calculateScore(newHand);
+
+                if (tempScore >= 17) { // - condition for dealer to stand
+
+                    if (tempScore <= 21 && tempScore >= scoreToBeat) { // dealer win condition
+                        atomicWinProb.set(atomicWinProb.get() + cardProbabilities[finalI]);
+                    } // else - dealer loses
+                    // increase dealer win probability by 0 (do nothing)
+
+                    latch.countDown();
+                    return;
+                }
+
+                int[] newDeck = cardsInDeck.clone();
+                newDeck[finalI]--;
+
+
                 // recursive call
+                // only when dealer has play to make
                 atomicWinProb.set(calculateDealerChances(newHand, newDeck, scoreToBeat) * cardProbabilities[finalI] +
                         atomicWinProb.get());
 
