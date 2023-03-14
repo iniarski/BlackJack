@@ -83,6 +83,8 @@ public class Game {
                         break;
                 }
 
+                player.printHand();
+
             } while (playerMakesNextMove);
 
 
