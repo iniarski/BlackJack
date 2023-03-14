@@ -148,7 +148,7 @@ public class BlackjackUtil {
 
                 if (tempScore >= 17) { // - condition for dealer to stand
                     if (tempScore > 21) { // dealer goes bust
-                        dealerScoreProbabilities[6] += caseProbability * cardProbabilities[finalI];
+                        dealerScoreProbabilities[5] += caseProbability * cardProbabilities[finalI];
                     } else { // dealer stands
                         dealerScoreProbabilities[tempScore - 17] += caseProbability * cardProbabilities[finalI];
                     }
