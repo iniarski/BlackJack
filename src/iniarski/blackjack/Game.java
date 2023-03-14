@@ -27,6 +27,9 @@ public class Game {
             System.out.println("Hand : " + (i + 1) + "\n");
 
             System.out.println("Player : ");
+            int playerBet = player.bet(minBet, maxBet);
+            System.out.println("Player's bet : " + playerBet);
+
             player.setHand(deck.deal(), deck.deal());
             player.printHand();
 
@@ -34,25 +37,63 @@ public class Game {
             dealer.setHand(deck.deal(), deck.dealFaceDownCard());
             dealer.printHand();
 
+            BlackjackUtil.getInstance().calculateDealerProbabilities(
+                    dealer.getRevealedCard(), deck.getCardsLeftSimplified());
+
             System.out.println("Player move");
-            int playerBet = player.bet(minBet, maxBet);
-            System.out.println("Player's bet : " + playerBet);
-            player.calculateBestMove(deck.getCardsLeftSimplified(), dealer.getRevealedCard());
-            while (player.play() != 0 && player.getScore() <= 21) {
-                player.addCard(deck.deal());
-                player.printHand();
-                if(player.getScore() > 21) {
-                    continue;
-                    // skipping unnecessary computation if player is busted
+
+            boolean playerMakesNextMove = true;
+            boolean dealerMoves = true;
+
+            do {
+                player.calculateBestMove(deck.getCardsLeftSimplified());
+
+                switch (player.play()) {
+                    case Player.STAND:
+                        playerMakesNextMove = false;
+                        System.out.println("Player stands");
+                        break;
+
+                    case Player.HIT:
+                        player.addCard(deck.deal());
+                        System.out.println("Player hits");
+                        break;
+
+                    case Player.DOUBLE_DOWN:
+                        player.addCard(deck.deal());
+                        playerMakesNextMove = false;
+                        player.winMoney(-playerBet);
+                        playerBet = 2 * playerBet;
+                        System.out.println("Player doubles bet! New bet : " + playerBet);
+                        break;
+
+                    case Player.SPLIT:
+                        // not yet implemented
+                        break;
+
+                    case Player.SURRENDER:
+                            playerMakesNextMove = false;
+                            player.winMoney(-playerBet / 2);
+                            dealerMoves = false;
+                            System.out.println("Player surrenders loosing half bet. New balance : " + player.getMoney());
+                            break;
+
+                    default:
+                        System.out.println("You shouldn't be seeing this message - something went horribly wrong.");
+                        break;
                 }
-                player.calculateBestMove(deck.getCardsLeftSimplified(), dealer.getRevealedCard());
-            }
+
+            } while (playerMakesNextMove);
+
 
             // If the player is BUST (over 21) the dealer doesn't move
-
             if (player.getScore() > 21) {
                 System.out.println("BUST - house wins");
                 System.out.println("Player's money : " + player.getMoney() + "\n");
+                continue;
+            }
+
+            if (!dealerMoves) {
                 continue;
             }
 

@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 public class ComputerPlayer extends Player{
 
-
+    public final static double NOT_POSSIBLE = -128.0;
     private int money;
     private int optimalMove;
     public ComputerPlayer(int money){
@@ -51,7 +51,7 @@ public class ComputerPlayer extends Player{
 
     // this function will save the code of best move to optimalMove field
     // takes the state of the game ( Deck.getCardsLeftSimplified()) and dealer's first card rank as inputs
-    public void calculateBestMove(int[] cardsLeft, int dealerCardRank) {
+    public void calculateBestMove(int[] cardsLeft) {
 
         // if the score is 21 the only valid move is to stand
         if (score==21) {
@@ -77,33 +77,89 @@ public class ComputerPlayer extends Player{
             cardsInHand[i] = hand.get(i).getRank();
         }
 
-        // Temporary solution
-        // TODO :  implement doubling-down, surrendering and splitting
+
+        // expectedValues array stores expected value of actions
+        // were expectedValues[ACTION] - expected value of doing action
+        double[] expectedValues = new double[5];
+        double[] dealerProbabilities = BlackjackUtil.getInstance().getDealerScoreProbabilities();
+
+        // 0 - STAND
+        double standWinProbability = 0.0;
+        // adding probability that dealer has lower score
+        for (int i = 0; i < score - 17; i++) {
+            standWinProbability += dealerProbabilities[i];
+        }
+        // adding probability that dealer is bust
+        standWinProbability += dealerProbabilities[5];
+
+        // expected value of standing : ev = 1 * p - 1 * (1 - p) = 2p - 1
+        // where p - probability of winning if standing
+
+        expectedValues[STAND] = 2.0 * standWinProbability - 1.0;
+
+        // 1 - HIT
+
+        // TODO implement recursive lookup or something
 
         double bustProbability = 0.0;
-
-        double dealerWinProbability = BlackjackUtil.getInstance()
-                .calculateDealerChances(new int[]{dealerCardRank}, cardsLeft, score);
+        double hitWinProbability = 0.0;
 
         for (int i = 0; i < 10; i++) {
-            // making an array for possible hand
-            int[] possibleHand = Arrays.copyOf(cardsInHand, cardsInHand.length + 1);
-            possibleHand[possibleHand.length - 1] = i;
+            int[] newHand = Arrays.copyOf(cardsInHand, cardsInHand.length + 1);
+            newHand[newHand.length - 1] = i;
 
-            // checking if is a bust
-            if (BlackjackUtil.getInstance().calculateScore(possibleHand) > 21) {
-                // if is, add to probability of busting
-                bustProbability += cardProbabilities[i];
+            int tempScore = BlackjackUtil.getInstance().calculateScore(newHand);
+            if (tempScore > 21) {
+                bustProbability +=  cardProbabilities[i];
+            } else {
+                double oneHitWinProbability = 0.0;
+                // adding probability that dealer has lower score
+                for (int j = 0; j < tempScore - 17; j++) {
+                    oneHitWinProbability += dealerProbabilities[j];
+                }
+                // adding probability that dealer is bust
+                oneHitWinProbability += dealerProbabilities[5];
+
+                hitWinProbability += oneHitWinProbability + cardProbabilities[i];
             }
         }
 
-        if (dealerWinProbability > bustProbability) {
-            optimalMove = HIT;
-        } else {
-            optimalMove = STAND;
-        }
-    }
+        // Temporary solution, make proper probability calculation later
+        expectedValues[HIT] = hitWinProbability - bustProbability;
 
+        // 2 - DOUBLE-DOWN
+
+        // probability with winning with one card was calculate previously
+        // possible only if first move
+
+        if (hand.size() != 2) {
+            expectedValues[DOUBLE_DOWN] = NOT_POSSIBLE;
+        } else {
+            expectedValues[DOUBLE_DOWN] = 4.0 * hitWinProbability - 2.0;
+        }
+
+        // 3 - SPLIT
+        // TODO : splitting
+
+        expectedValues[SPLIT] = NOT_POSSIBLE;
+
+        // 4 - SURRENDER
+        // surrendering means forfeiting half original bet
+
+        // hence :
+        expectedValues[SURRENDER] = -0.5;
+
+        // looking for the highest expected value
+        int maxIndex = 0;
+
+        for (int i = 1; i < 5; i++) {
+            if (expectedValues[i] > expectedValues[maxIndex]) {
+                maxIndex = i;
+            }
+        }
+
+        optimalMove = maxIndex;
+    }
 
     public void winMoney(int winnings) {
         money += winnings;
