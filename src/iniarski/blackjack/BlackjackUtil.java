@@ -92,7 +92,12 @@ public class BlackjackUtil {
                     // checking if the dealer is at least 17 points
                     // NOTE : it is impossible to bust with only 2 cards (max score with 2 cards is 21)
                     if (tempScore >= 17) { // if score is at least 17 dealer will stand
-                        dealerScoreProbabilities[tempScore - 17] += cardProbabilities[finalI];
+
+                        if (tempScore > 21) { // dealer goes bust
+                            dealerScoreProbabilities[5] += cardProbabilities[finalI];
+                        } else {
+                            dealerScoreProbabilities[tempScore - 17] += cardProbabilities[finalI];
+                        }
                         latch.countDown();
                         return;
                     }
