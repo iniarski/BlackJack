@@ -102,7 +102,7 @@ public class ComputerPlayer extends Player{
         // TODO implement recursive lookup or something
 
         double bustProbability = 0.0;
-        double hitWinProbability = 0.0;
+        double firstHitWinProbability = 0.0;
 
         for (int i = 0; i < 10; i++) {
             int[] newHand = Arrays.copyOf(cardsInHand, cardsInHand.length + 1);
@@ -120,22 +120,22 @@ public class ComputerPlayer extends Player{
                 // adding probability that dealer is bust
                 oneHitWinProbability += dealerProbabilities[5];
 
-                hitWinProbability += oneHitWinProbability + cardProbabilities[i];
+                firstHitWinProbability += oneHitWinProbability * cardProbabilities[i];
             }
         }
 
         // Temporary solution, make proper probability calculation later
-        expectedValues[HIT] = hitWinProbability - bustProbability;
+        expectedValues[HIT] = firstHitWinProbability - bustProbability;
 
         // 2 - DOUBLE-DOWN
 
         // probability with winning with one card was calculate previously
         // possible only if first move
 
-        if (hand.size() != 2) {
-            expectedValues[DOUBLE_DOWN] = NOT_POSSIBLE;
+        if (hand.size() == 2) {
+            expectedValues[DOUBLE_DOWN] = 4.0 * firstHitWinProbability - 2.0;
         } else {
-            expectedValues[DOUBLE_DOWN] = 4.0 * hitWinProbability - 2.0;
+            expectedValues[DOUBLE_DOWN] = NOT_POSSIBLE;
         }
 
         // 3 - SPLIT
@@ -145,9 +145,14 @@ public class ComputerPlayer extends Player{
 
         // 4 - SURRENDER
         // surrendering means forfeiting half original bet
+        // possible only on first move
 
         // hence :
-        expectedValues[SURRENDER] = -0.5;
+        if (hand.size() == 2) {
+            expectedValues[SURRENDER] = -0.5;
+        } else {
+            expectedValues[SURRENDER] = NOT_POSSIBLE;
+        }
 
         // looking for the highest expected value
         int maxIndex = 0;
