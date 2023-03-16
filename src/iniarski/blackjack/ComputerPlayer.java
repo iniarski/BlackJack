@@ -2,12 +2,16 @@ package iniarski.blackjack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ComputerPlayer extends Player{
 
     public final static double NOT_POSSIBLE = -128.0;
     private int money;
+    // this field is used to store the move computed by
     private int optimalMove;
+    private final int MAX_RECURSIONS = 4;
     public ComputerPlayer(int money){
         this.money = money;
     }
@@ -99,19 +103,18 @@ public class ComputerPlayer extends Player{
 
         // 1 - HIT
 
-        // TODO implement recursive lookup or something
-
-        double bustProbability = 0.0;
         double firstHitWinProbability = 0.0;
+        double hitWinProbability = 0.0;
 
         for (int i = 0; i < 10; i++) {
+            if (cardsLeft[i] == 0) {
+                continue;
+            }
             int[] newHand = Arrays.copyOf(cardsInHand, cardsInHand.length + 1);
             newHand[newHand.length - 1] = i;
 
             int tempScore = BlackjackUtil.getInstance().calculateScore(newHand);
-            if (tempScore > 21) {
-                bustProbability +=  cardProbabilities[i];
-            } else {
+            if (tempScore <= 21){
                 double oneHitWinProbability = 0.0;
                 // adding probability that dealer has lower score
                 for (int j = 0; j < tempScore - 17; j++) {
@@ -121,11 +124,17 @@ public class ComputerPlayer extends Player{
                 oneHitWinProbability += dealerProbabilities[5];
 
                 firstHitWinProbability += oneHitWinProbability * cardProbabilities[i];
+
+                int [] newDeck = Arrays.copyOf(cardsLeft, cardsLeft.length);
+                newDeck[i]--;
+
+                hitWinProbability += cardProbabilities[i] *
+                        calculateHitWinProbability(newHand, newDeck, nOfCardsLeft, 0);
             }
         }
 
         // Temporary solution, make proper probability calculation later
-        expectedValues[HIT] = firstHitWinProbability - bustProbability;
+        expectedValues[HIT] = firstHitWinProbability;
 
         // 2 - DOUBLE-DOWN
 
@@ -164,6 +173,86 @@ public class ComputerPlayer extends Player{
         }
 
         optimalMove = maxIndex;
+    }
+
+    private double calculateHitWinProbability(int[] cardsInHand, int[] cardsInDeck, int cardsLeft, int recursionNumber) {
+        // returning if reached maximum search depth;
+        if (recursionNumber == MAX_RECURSIONS) {
+            return 0.0;
+        }
+
+        //calculating probabilities of getting cards
+        double[] cardProbabilities = new double[10];
+
+        for (int i = 0; i < 10; i++) {
+            cardProbabilities[i] = (double) cardsInDeck[i] / (double) cardsLeft;
+        }
+
+        double[] dealerScoreProbabilities = BlackjackUtil.getInstance().getDealerScoreProbabilities();
+
+        double winProb = 0.0;
+
+        // multithreading here
+        CountDownLatch latch = new CountDownLatch(10);
+
+        for (int i = 0; i < 10; i++) {
+            int finalI = i;
+            AtomicReference<Double> tempWinProb = new AtomicReference<>(0.0);
+
+            Thread thread = new Thread(() -> {
+
+                // end if no cards of rank left
+                if (cardsInDeck[finalI] == 0){
+                    tempWinProb.set(0.0);
+                    latch.countDown();
+                    return;
+                }
+
+                int[] newHand = Arrays.copyOf(cardsInHand, cardsInHand.length + 1);
+                newHand[newHand.length - 1] = finalI;
+
+                int tempScore = BlackjackUtil.getInstance().calculateScore(newHand);
+
+                // bust
+                if (tempScore > 21) {
+                    tempWinProb.set(0.0);
+                    latch.countDown();
+                    return;
+                }
+
+                double standNowWinProbability = 0.0;
+
+                for (int j = 0; j < tempScore - 17 ; j++) {
+                    standNowWinProbability += dealerScoreProbabilities[j];
+                }
+
+                standNowWinProbability += dealerScoreProbabilities[5];
+
+                int[] newDeck = Arrays.copyOf(cardsInDeck, cardsInDeck.length);
+                newDeck[finalI]--;
+
+                double hitMoreWinProbability =
+                        calculateHitWinProbability(newHand, newDeck, cardsLeft - 1, recursionNumber + 1);
+
+                tempWinProb.set(cardProbabilities[finalI] * standNowWinProbability > hitMoreWinProbability ?
+                        standNowWinProbability : hitMoreWinProbability);
+
+                latch.countDown();
+
+            });
+
+            thread.start();
+
+            winProb += tempWinProb.get();
+        }
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return  winProb;
     }
 
     public void winMoney(int winnings) {
