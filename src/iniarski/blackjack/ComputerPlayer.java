@@ -134,7 +134,7 @@ public class ComputerPlayer extends Player{
         }
 
         // Temporary solution, make proper probability calculation later
-        expectedValues[HIT] = firstHitWinProbability;
+        expectedValues[HIT] =  2.0 * hitWinProbability - 1.0;
 
         // 2 - DOUBLE-DOWN
 
