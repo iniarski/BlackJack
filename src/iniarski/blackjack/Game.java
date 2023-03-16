@@ -57,6 +57,9 @@ public class Game {
                     case Player.HIT:
                         player.addCard(deck.deal());
                         System.out.println("Player hits");
+                        if (player.getScore() > 21) {
+                            playerMakesNextMove = false;
+                        }
                         break;
 
                     case Player.DOUBLE_DOWN:
