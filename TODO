@@ -1,0 +1,28 @@
+
+1. Klasa do wczytawania zasad gry (maxBet, handsPlayed itd.)
+    wersja minimum :
+        wczytywanie z pliku (np .properties, ewentualnie inne rzoszerzenie)
+    wersja ambitna :
+        okienko w JavaFX (bo swing == rzyg) które ładnie zapyta o te wszystkie rzeczy
+    wersja ambitna+ :
+        abstract klasa z której będą dziedziczyć te wyżej opisane i w zależności od potrzeb użyje się jednej z nich
+
+    parametry które podaje użytkownik
+        - nOfDecks (liczba talii którymi będzie się grać int od 1 - 8)
+        - handsPlayed (liczba rozegrany rozdań dodatni int)
+        - startingMoney (self-explanatory int)
+        ( fajnie jeżeli)
+        - fixedBetSize ( bool - czy jest jedna ustalona wysokość zakładu )
+            true : ( wtedy maxBet = minBet = bet)
+            false : ( maxBet, minBet +int, maxBet >= minBet)
+        (jeżeli nie)
+            maxBet, minBet
+            (da się zrobić fixedBet naokoło poprostu daje sie maxBet = minBet)
+
+2. Wykresy (ambitne)
+    znaleźć jakąś bibliotekę do rysowania wykresów
+    zrobić wykres money(hand) dla n symulacji
+    i wykres wartości średniej
+
+3. (! wyjątkowo ambitne)
+    Wykazać się kreatywnością i znaleźć coś do zrobienia
