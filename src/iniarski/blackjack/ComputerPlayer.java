@@ -103,38 +103,51 @@ public class ComputerPlayer extends Player{
 
         // 1 - HIT
 
-        double firstHitWinProbability = 0.0;
-        double hitWinProbability = 0.0;
+        AtomicReference<Double> firstHitWinProbability = new AtomicReference<>(0.0);
+        AtomicReference<Double> hitWinProbability = new AtomicReference<>(0.0);
+
+        CountDownLatch latch = new CountDownLatch(10);
 
         for (int i = 0; i < 10; i++) {
-            if (cardsLeft[i] == 0) {
-                continue;
-            }
-            int[] newHand = Arrays.copyOf(cardsInHand, cardsInHand.length + 1);
-            newHand[newHand.length - 1] = i;
+            int finalI = i;
 
-            int tempScore = BlackjackUtil.getInstance().calculateScore(newHand);
-            if (tempScore <= 21){
-                double oneHitWinProbability = 0.0;
-                // adding probability that dealer has lower score
-                for (int j = 0; j < tempScore - 17; j++) {
-                    oneHitWinProbability += dealerProbabilities[j];
+            int finalNOfCardsLeft = nOfCardsLeft;
+            Thread thread = new Thread(() -> {
+
+                // checking for case where there are no cards left of a rank;
+                if (cardsLeft[finalI] == 0) {
+                    latch.countDown();
+                    return;
                 }
-                // adding probability that dealer is bust
-                oneHitWinProbability += dealerProbabilities[5];
 
-                firstHitWinProbability += oneHitWinProbability * cardProbabilities[i];
+                int[] newHand = Arrays.copyOf(cardsInHand, cardsInHand.length + 1);
+                newHand[newHand.length - 1] = finalI;
 
-                int [] newDeck = Arrays.copyOf(cardsLeft, cardsLeft.length);
-                newDeck[i]--;
+                int tempScore = BlackjackUtil.getInstance().calculateScore(newHand);
+                if (tempScore <= 21) {
+                    double oneHitWinProbability = 0.0;
+                    // adding probability that dealer has lower score
+                    for (int j = 0; j < tempScore - 17; j++) {
+                        oneHitWinProbability += dealerProbabilities[j];
+                    }
+                    // adding probability that dealer is bust
+                    oneHitWinProbability += dealerProbabilities[5];
+                    firstHitWinProbability.set(firstHitWinProbability.get() +
+                            oneHitWinProbability * cardProbabilities[finalI] );
+                } else { // bust
+                    latch.countDown();
+                    return;
+                }
 
-                hitWinProbability += cardProbabilities[i] *
-                        calculateHitWinProbability(newHand, newDeck, nOfCardsLeft, 0);
+                    int [] newDeck = Arrays.copyOf(cardsLeft, cardsLeft.length);
+                    newDeck[finalI]--;
+
+                    hitWinProbability.set(hitWinProbability.get() + cardProbabilities[finalI] *
+                            calculateHitWinProbability(newHand, newDeck, finalNOfCardsLeft - 1, 0));
+            });
             }
-        }
 
-        // Temporary solution, make proper probability calculation later
-        expectedValues[HIT] =  2.0 * hitWinProbability - 1.0;
+        expectedValues[HIT] =  2.0 * hitWinProbability.get() - 1.0;
 
         // 2 - DOUBLE-DOWN
 
@@ -142,7 +155,7 @@ public class ComputerPlayer extends Player{
         // possible only if first move
 
         if (hand.size() == 2) {
-            expectedValues[DOUBLE_DOWN] = 4.0 * firstHitWinProbability - 2.0;
+            expectedValues[DOUBLE_DOWN] = 4.0 * firstHitWinProbability.get() - 2.0;
         } else {
             expectedValues[DOUBLE_DOWN] = NOT_POSSIBLE;
         }
