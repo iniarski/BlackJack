@@ -37,10 +37,14 @@ public class ComputerPlayer extends Player{
     }
 
     //
-    public int bet(int minBet, int maxBet) {
-        // TODO : Implement betting logic
+    public int bet(int minBet, int maxBet, int[] cardsLeft) {
 
-        int preferredBet = money / 20;
+        double winProb = BlackjackUtil.getInstance().calculatePlayerWinningChances(cardsLeft);
+        // optimal bet fraction derived from Kelly's criterion
+
+        double betFraction = 2.0 * winProb - 1.0;
+
+        int preferredBet = (int) (money * betFraction);
 
         if (preferredBet < minBet) {
             preferredBet = minBet;

@@ -27,7 +27,7 @@ public class Game {
             System.out.println("Hand : " + (i + 1) + "\n");
 
             System.out.println("Player : ");
-            int playerBet = player.bet(minBet, maxBet);
+            int playerBet = player.bet(minBet, maxBet, deck.getCardsLeftSimplified());
             System.out.println("Player's bet : " + playerBet);
 
             player.setHand(deck.deal(), deck.deal());
