@@ -187,5 +187,103 @@ public class BlackjackUtil {
             e.printStackTrace();
         }
     }
+
+    public double calculatePlayerWinningChances(int[] cardsLeft) {
+
+        // !NOTE : this method resets dealerScoreProbabilities
+        // run calculateDealersScoreProbabilities after using this method
+
+        int nOfCardsLeft = 0;
+
+        for (int n : cardsLeft) {
+            nOfCardsLeft += n;
+        }
+
+        double[][] winProbMatrix = new double[10][10];
+
+        double[] cardProbabilities = new double[10];
+
+        for (int i = 0; i < 10; i++) {
+            cardProbabilities[i] = (double) cardsLeft[i] / (double) nOfCardsLeft;
+        }
+
+        Arrays.fill(dealerScoreProbabilities, 0.0);
+
+        calculatePossibleDealerHands(new int[]{}, cardsLeft, 1.0);
+
+        CountDownLatch latch = new CountDownLatch(55);
+
+        for (int i = 0; i < 10; i++) {
+            for (int j = i; j < 10; j++) {
+                int finalI = i; int finalJ = j;
+                Thread thread = new Thread(() -> {
+                    double standWinProb = 0.0;
+
+                    int tempScore = calculateScore(new int[]{finalI, finalJ});
+
+                    for (int k = 0; k < tempScore - 17; k++) {
+                        standWinProb += dealerScoreProbabilities[k];
+                    }
+                    standWinProb += dealerScoreProbabilities[5];
+
+                    double oneHitWinProb = 0.0;
+
+                    for (int k = 0; k < 10; k++) {
+                        int inLoopScore = calculateScore(new int[]{finalI, finalJ, k});
+                        // breaking the loop whe player goes bust
+                        if (inLoopScore > 21) {
+                            k = 16;
+                            continue;
+                        }
+                        double inLoopWinProb = 0.0;
+                        for (int l = 0; l < inLoopScore - 17; l++) {
+                            inLoopWinProb += dealerScoreProbabilities[l];
+                        }
+                        inLoopWinProb += dealerScoreProbabilities[5];
+                        oneHitWinProb += inLoopWinProb * cardProbabilities[k];
+                    }
+
+                    winProbMatrix[finalI][finalJ] = Math.max(standWinProb, oneHitWinProb);
+
+                    latch.countDown();
+                });
+
+                thread.start();
+            }
+        }
+
+        double[][] CardProbMatrix = new double[10][10];
+        for (int i = 0; i < 10; i++) {
+            for (int j = i + 1; j < 10; j++) {
+                // calculating the upper half of the matrix
+                CardProbMatrix[i][j] = (double) (cardsLeft[i] * cardsLeft[j])
+                        / (double) (nOfCardsLeft * (nOfCardsLeft - 1));
+                // that is identical to the bottom half of the matrix;
+                CardProbMatrix[j][i] = CardProbMatrix[i][j];
+            }
+        }
+
+        // now the diagonal
+        for (int i = 0; i < 10; i++) {
+            CardProbMatrix[i][i] = (double) (cardsLeft[i] * (cardsLeft[i] - 1)) /
+                    (double) (nOfCardsLeft * (nOfCardsLeft - 1));
+        }
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        double playerWinningProb = 0.0;
+
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                playerWinningProb += CardProbMatrix[i][j] * winProbMatrix[i][j];
+            }
+        }
+
+        return playerWinningProb;
+    }
 }
 
