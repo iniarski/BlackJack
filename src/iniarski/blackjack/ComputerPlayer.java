@@ -40,6 +40,8 @@ public class ComputerPlayer extends Player{
     public int bet(int minBet, int maxBet, int[] cardsLeft) {
 
         double winProb = BlackjackUtil.getInstance().calculatePlayerWinningChances(cardsLeft);
+        System.out.println("Player win probability : " + winProb);
+
         // optimal bet fraction derived from Kelly's criterion
 
         double betFraction = 2.0 * winProb - 1.0;
@@ -91,6 +93,9 @@ public class ComputerPlayer extends Player{
         double[] expectedValues = new double[5];
         double[] dealerProbabilities = BlackjackUtil.getInstance().getDealerScoreProbabilities();
 
+        System.out.println("Dealer score probabilities");
+        System.out.println(Arrays.toString(dealerProbabilities));
+
         // 0 - STAND
         double standWinProbability = 0.0;
         // adding probability that dealer has lower score
@@ -138,6 +143,8 @@ public class ComputerPlayer extends Player{
                     oneHitWinProbability += dealerProbabilities[5];
                     firstHitWinProbability.set(firstHitWinProbability.get() +
                             oneHitWinProbability * cardProbabilities[finalI] );
+
+                    System.out.println("firstHitWinProbability : " + firstHitWinProbability.get());
                 } else { // bust
                     latch.countDown();
                     return;
@@ -148,8 +155,14 @@ public class ComputerPlayer extends Player{
 
                     hitWinProbability.set(hitWinProbability.get() + cardProbabilities[finalI] *
                             calculateHitWinProbability(newHand, newDeck, finalNOfCardsLeft - 1, 0));
+
+                    System.out.println("hitWinProbability : " + hitWinProbability.get());
+
+                    latch.countDown();
             });
             }
+
+        
 
         expectedValues[HIT] =  2.0 * hitWinProbability.get() - 1.0;
 
@@ -182,6 +195,9 @@ public class ComputerPlayer extends Player{
 
         // looking for the highest expected value
         int maxIndex = 0;
+
+        System.out.println("Expected values : ");
+        System.out.println(Arrays.toString(expectedValues));
 
         for (int i = 1; i < 5; i++) {
             if (expectedValues[i] > expectedValues[maxIndex]) {
