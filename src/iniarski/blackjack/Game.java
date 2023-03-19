@@ -76,7 +76,7 @@ public class Game {
 
                     case Player.SURRENDER:
                             playerMakesNextMove = false;
-                            player.winMoney(-playerBet / 2);
+                            player.winMoney(playerBet / 2);
                             dealerMoves = false;
                             System.out.println("Player surrenders loosing half bet. New balance : " + player.getMoney());
                             break;
