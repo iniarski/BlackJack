@@ -11,6 +11,7 @@ public class BlackjackUtil {
     // NEGLIGIBLE_THRESHOLD determines when probability is so small that case can be not considered
     public static final float NEGLIGIBLE_THRESHOLD = 0.0005f;
     public static final byte MAX_RECURSIONS = 4;
+    public static final long BYTES_IN_MEGABYTE = 1_048_576;
     private static final BlackjackUtil instance = new BlackjackUtil();
 
     private final float[] dealerScoreProbabilities = new float[6];
@@ -313,12 +314,13 @@ public class BlackjackUtil {
 
         // multithreading here
         CountDownLatch latch = new CountDownLatch(10);
+        // the stack size will be smaller in consecutive recursive calls (never 0)
+        long threadStackSize = (MAX_RECURSIONS - recursionNumber) * BYTES_IN_MEGABYTE;
 
         for (byte i = 0; i < 10; i++) {
             byte finalI = i;
 
-            Thread thread = new Thread(() -> {
-
+            Thread thread = new Thread(null, () -> {
                 // end if no cards of rank left
                 if (cardsInDeck[finalI] == 0){
                     latch.countDown();
@@ -358,7 +360,7 @@ public class BlackjackUtil {
 
                 latch.countDown();
 
-            });
+            }, "Thread-" + Thread.currentThread().hashCode() + "-" + i, threadStackSize);
 
             thread.start();
         }
