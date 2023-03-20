@@ -11,7 +11,6 @@ public class ComputerPlayer extends Player{
     private int money;
     // this field is used to store the move computed by
     private int optimalMove;
-    private final int MAX_RECURSIONS = 3;
 
     public ComputerPlayer(int money){
         this.money = money;
@@ -155,7 +154,8 @@ public class ComputerPlayer extends Player{
                     newDeck[finalI]--;
 
                     final double thisHitWinProb = cardProbabilities[finalI] *
-                            calculateHitWinProbability(newHand, newDeck, finalNOfCardsLeft - 1, 0);
+                            BlackjackUtil.getInstance()
+                                    .calculateHitWinProbability(newHand, newDeck, finalNOfCardsLeft - 1, 0);
 
                     hitWinProbability.set(hitWinProbability.get() + thisHitWinProb);
 
@@ -219,84 +219,6 @@ public class ComputerPlayer extends Player{
         optimalMove = maxIndex;
     }
 
-    private double calculateHitWinProbability(int[] cardsInHand, int[] cardsInDeck, int cardsLeft, int recursionNumber) {
-        // returning if reached maximum search depth;
-        if (recursionNumber == MAX_RECURSIONS) {
-            return 0.0;
-        }
-
-        //calculating probabilities of getting cards
-        double[] cardProbabilities = new double[10];
-
-        for (int i = 0; i < 10; i++) {
-            cardProbabilities[i] = (double) cardsInDeck[i] / (double) cardsLeft;
-        }
-
-        double[] dealerScoreProbabilities = BlackjackUtil.getInstance().getDealerScoreProbabilities();
-
-        AtomicReference<Double> winProb = new AtomicReference<>(0.0);
-
-        // multithreading here
-        CountDownLatch latch = new CountDownLatch(10);
-
-        for (int i = 0; i < 10; i++) {
-            int finalI = i;
-
-            Thread thread = new Thread(() -> {
-
-                // end if no cards of rank left
-                if (cardsInDeck[finalI] == 0){
-                    winProb.set(0.0);
-                    latch.countDown();
-                    return;
-                }
-
-                int[] newHand = Arrays.copyOf(cardsInHand, cardsInHand.length + 1);
-                newHand[newHand.length - 1] = finalI;
-
-                int tempScore = BlackjackUtil.getInstance().calculateScore(newHand);
-
-                // bust
-                if (tempScore > 21) {
-                    winProb.set(0.0);
-                    latch.countDown();
-                    return;
-                }
-
-                double standNowWinProbability = 0.0;
-
-                for (int j = 0; j < tempScore - 17 ; j++) {
-                    standNowWinProbability += dealerScoreProbabilities[j];
-                }
-
-                standNowWinProbability += dealerScoreProbabilities[5];
-
-                int[] newDeck = Arrays.copyOf(cardsInDeck, cardsInDeck.length);
-                newDeck[finalI]--;
-
-                double hitMoreWinProbability =
-                        calculateHitWinProbability(newHand, newDeck, cardsLeft - 1, recursionNumber + 1);
-
-                winProb.set(winProb.get() +
-                        cardProbabilities[finalI] * standNowWinProbability > hitMoreWinProbability ?
-                        standNowWinProbability : hitMoreWinProbability);
-
-
-                latch.countDown();
-
-            });
-
-            thread.start();
-        }
-
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        return  winProb.get();
-    }
 
     public void winMoney(int winnings) {
         money += winnings;

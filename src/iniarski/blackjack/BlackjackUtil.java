@@ -4,11 +4,13 @@ package iniarski.blackjack;
 
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class BlackjackUtil {
 
     // NEGLIGIBLE_THRESHOLD determines when probability is so small that case can be not considered
     public static final double NEGLIGIBLE_THRESHOLD = 0.0005;
+    public static final int MAX_RECURSIONS = 4;
     private static final BlackjackUtil instance = new BlackjackUtil();
 
     private final double[] dealerScoreProbabilities = new double[6];
@@ -285,5 +287,83 @@ public class BlackjackUtil {
 
         return playerWinningProb;
     }
+
+    public double calculateHitWinProbability(int[] cardsInHand, int[] cardsInDeck, int cardsLeft, int recursionNumber) {
+        // returning if reached maximum search depth;
+        if (recursionNumber == MAX_RECURSIONS) {
+            return 0.0;
+        }
+
+        //calculating probabilities of getting cards
+        double[] cardProbabilities = new double[10];
+
+        for (int i = 0; i < 10; i++) {
+            cardProbabilities[i] = (double) cardsInDeck[i] / (double) cardsLeft;
+        }
+
+        AtomicReference<Double> winProb = new AtomicReference<>(0.0);
+
+        // multithreading here
+        CountDownLatch latch = new CountDownLatch(10);
+
+        for (int i = 0; i < 10; i++) {
+            int finalI = i;
+
+            Thread thread = new Thread(() -> {
+
+                // end if no cards of rank left
+                if (cardsInDeck[finalI] == 0){
+                    winProb.set(0.0);
+                    latch.countDown();
+                    return;
+                }
+
+                int[] newHand = Arrays.copyOf(cardsInHand, cardsInHand.length + 1);
+                newHand[newHand.length - 1] = finalI;
+
+                int tempScore = BlackjackUtil.getInstance().calculateScore(newHand);
+
+                // bust
+                if (tempScore > 21) {
+                    winProb.set(0.0);
+                    latch.countDown();
+                    return;
+                }
+
+                double standNowWinProbability = 0.0;
+
+                for (int j = 0; j < tempScore - 17 ; j++) {
+                    standNowWinProbability += dealerScoreProbabilities[j];
+                }
+
+                standNowWinProbability += dealerScoreProbabilities[5];
+
+                int[] newDeck = Arrays.copyOf(cardsInDeck, cardsInDeck.length);
+                newDeck[finalI]--;
+
+                double hitMoreWinProbability =
+                        calculateHitWinProbability(newHand, newDeck, cardsLeft - 1, recursionNumber + 1);
+
+                winProb.set(winProb.get() +
+                        cardProbabilities[finalI] * standNowWinProbability > hitMoreWinProbability ?
+                        standNowWinProbability : hitMoreWinProbability);
+
+
+                latch.countDown();
+
+            });
+
+            thread.start();
+        }
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return  winProb.get();
+    }
+
 }
 
