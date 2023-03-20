@@ -9,7 +9,7 @@ public class Game {
 
     }
 
-    protected int nOfDecks = 8;
+    protected short nOfDecks = 8;
     protected int minBet = 10;
     protected int maxBet = 100;
     protected int startingMoney = 250;

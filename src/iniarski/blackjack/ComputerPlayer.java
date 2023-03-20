@@ -7,10 +7,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class ComputerPlayer extends Player{
 
-    public final static double NOT_POSSIBLE = -128.0;
+    public final static float NOT_POSSIBLE = -128.0f;
     private int money;
     // this field is used to store the move computed by
-    private int optimalMove;
+    private byte optimalMove;
 
     public ComputerPlayer(int money){
         this.money = money;
@@ -32,19 +32,19 @@ public class ComputerPlayer extends Player{
     }
 
     @Override
-    public int play() {
+    public byte play() {
         return optimalMove;
     }
 
     //
-    public int bet(int minBet, int maxBet, int[] cardsLeft) {
+    public int bet(int minBet, int maxBet, short[] cardsLeft) {
 
-        double winProb = BlackjackUtil.getInstance().calculatePlayerWinningChances(cardsLeft);
+        float winProb = BlackjackUtil.getInstance().calculatePlayerWinningChances(cardsLeft);
         System.out.println("Player win probability : " + winProb);
 
         // optimal bet fraction derived from Kelly's criterion
 
-        double betFraction = 2.0 * winProb - 1.0;
+        float betFraction = 2.0f * winProb - 1.0f;
 
         int preferredBet = (int) (money * betFraction);
 
@@ -61,7 +61,7 @@ public class ComputerPlayer extends Player{
 
     // this function will save the code of best move to optimalMove field
     // takes the state of the game ( Deck.getCardsLeftSimplified()) and dealer's first card rank as inputs
-    public void calculateBestMove(int[] cardsLeft) {
+    public void calculateBestMove(short[] cardsLeft) {
 
         // if the score is 21 the only valid move is to stand
         if (score==21) {
@@ -71,17 +71,17 @@ public class ComputerPlayer extends Player{
 
         // Calculating probability of getting each card
 
-        double[] cardProbabilities = new double[10];
+        float[] cardProbabilities = new float[10];
         int nOfCardsLeft = 0;
 
         for (int n : cardsLeft) {
             nOfCardsLeft += n;
         }
         for (int i = 0; i < 10; i++) {
-            cardProbabilities[i] = (double) cardsLeft[i] / (double) nOfCardsLeft;
+            cardProbabilities[i] = (float) cardsLeft[i] / (float) nOfCardsLeft;
         }
 
-        int[] cardsInHand = new int[hand.size()];
+        byte[] cardsInHand = new byte[hand.size()];
 
         for (int i = 0; i < hand.size(); i++) {
             cardsInHand[i] = hand.get(i).getRank();
@@ -90,14 +90,14 @@ public class ComputerPlayer extends Player{
 
         // expectedValues array stores expected value of actions
         // were expectedValues[ACTION] - expected value of doing action
-        double[] expectedValues = new double[5];
-        double[] dealerProbabilities = BlackjackUtil.getInstance().getDealerScoreProbabilities();
+        float[] expectedValues = new float[5];
+        float[] dealerProbabilities = BlackjackUtil.getInstance().getDealerScoreProbabilities();
 
         System.out.println("Dealer score probabilities");
         System.out.println(Arrays.toString(dealerProbabilities));
 
         // 0 - STAND
-        double standWinProbability = 0.0;
+        float standWinProbability = 0.0f;
         // adding probability that dealer has lower score
         for (int i = 0; i < score - 17; i++) {
             standWinProbability += dealerProbabilities[i];
@@ -108,17 +108,17 @@ public class ComputerPlayer extends Player{
         // expected value of standing : ev = 1 * p - 1 * (1 - p) = 2p - 1
         // where p - probability of winning if standing
 
-        expectedValues[STAND] = 2.0 * standWinProbability - 1.0;
+        expectedValues[STAND] = 2.0f * standWinProbability - 1.0f;
 
         // 1 - HIT
 
-        AtomicReference<Double> firstHitWinProbability = new AtomicReference<>(0.0);
-        AtomicReference<Double> hitWinProbability = new AtomicReference<>(0.0);
+        AtomicReference<Float> firstHitWinProbability = new AtomicReference<>(0.0f);
+        AtomicReference<Float> hitWinProbability = new AtomicReference<>(0.0f);
 
         CountDownLatch latch = new CountDownLatch(10);
 
-        for (int i = 0; i < 10; i++) {
-            int finalI = i;
+        for (byte i = 0; i < 10; i++) {
+            byte finalI = i;
 
             int finalNOfCardsLeft = nOfCardsLeft;
             Thread thread = new Thread(() -> {
@@ -129,12 +129,12 @@ public class ComputerPlayer extends Player{
                     return;
                 }
 
-                int[] newHand = Arrays.copyOf(cardsInHand, cardsInHand.length + 1);
+                byte[] newHand = Arrays.copyOf(cardsInHand, cardsInHand.length + 1);
                 newHand[newHand.length - 1] = finalI;
 
                 int tempScore = BlackjackUtil.getInstance().calculateScore(newHand);
                 if (tempScore <= 21) {
-                    double oneHitWinProbability = 0.0;
+                    float oneHitWinProbability = 0.0f;
                     // adding probability that dealer has lower score
                     for (int j = 0; j < tempScore - 17; j++) {
                         oneHitWinProbability += dealerProbabilities[j];
@@ -150,12 +150,12 @@ public class ComputerPlayer extends Player{
                     return;
                 }
 
-                    int [] newDeck = Arrays.copyOf(cardsLeft, cardsLeft.length);
+                    short [] newDeck = Arrays.copyOf(cardsLeft, cardsLeft.length);
                     newDeck[finalI]--;
 
-                    final double thisHitWinProb = cardProbabilities[finalI] *
+                    final float thisHitWinProb = cardProbabilities[finalI] *
                             BlackjackUtil.getInstance()
-                                    .calculateHitWinProbability(newHand, newDeck, finalNOfCardsLeft - 1, 0);
+                                    .calculateHitWinProbability(newHand, newDeck, (short) (finalNOfCardsLeft - 1), (byte) 0);
 
                     hitWinProbability.set(hitWinProbability.get() + thisHitWinProb);
 
@@ -175,15 +175,15 @@ public class ComputerPlayer extends Player{
 
 
 
-        expectedValues[HIT] =  2.0 * hitWinProbability.get() - 1.0;
+        expectedValues[HIT] =  2.0f * hitWinProbability.get() - 1.0f;
 
-        // 2 - DOUBLE-DOWN
+        // 2 - float-DOWN
 
         // probability with winning with one card was calculate previously
         // possible only if first move
 
         if (hand.size() == 2) {
-            expectedValues[DOUBLE_DOWN] = 4.0 * firstHitWinProbability.get() - 2.0;
+            expectedValues[DOUBLE_DOWN] = 4.0f * firstHitWinProbability.get() - 2.0f;
         } else {
             expectedValues[DOUBLE_DOWN] = NOT_POSSIBLE;
         }
@@ -199,18 +199,18 @@ public class ComputerPlayer extends Player{
 
         // hence :
         if (hand.size() == 2) {
-            expectedValues[SURRENDER] = -0.5;
+            expectedValues[SURRENDER] = -0.5f;
         } else {
             expectedValues[SURRENDER] = NOT_POSSIBLE;
         }
 
         // looking for the highest expected value
-        int maxIndex = 0;
+        byte maxIndex = 0;
 
         System.out.println("Expected values : ");
         System.out.println(Arrays.toString(expectedValues));
 
-        for (int i = 1; i < 5; i++) {
+        for (byte i = 1; i < 5; i++) {
             if (expectedValues[i] > expectedValues[maxIndex]) {
                 maxIndex = i;
             }

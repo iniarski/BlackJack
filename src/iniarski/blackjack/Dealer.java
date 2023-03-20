@@ -24,18 +24,18 @@ public class Dealer extends Player{
         return hand.get(1).getRank();
     }
 
-    public int getRevealedCard() {
+    public byte getRevealedCard() {
         return hand.get(0).getRank();
     }
 
     @Override
-    public int play() {
+    public byte play() {
         // According to the rules of Blackjack if the dealer has score of less than 17 he has to hit
         if (score < 17) {
-            return Player.HIT;
+            return HIT;
         }
         // else he has to stand
-        return Player.STAND;
+        return STAND;
     }
 
     @Override

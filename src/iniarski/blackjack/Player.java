@@ -10,16 +10,16 @@ import java.util.Arrays;
 
 public abstract class Player {
     // final variables describing actions taken in game
-    public final static int STAND = 0;
-    public final static int HIT = 1;
-    public final static int DOUBLE_DOWN = 2;
-    public final static int SPLIT = 3;
-    public final static int SURRENDER = 4;
+    public final static byte STAND = 0;
+    public final static byte HIT = 1;
+    public final static byte DOUBLE_DOWN = 2;
+    public final static byte SPLIT = 3;
+    public final static byte SURRENDER = 4;
 
     // information of the player's cards will be stored in an ArrayList
     protected ArrayList<Card> hand = new ArrayList<>();
 
-    protected int score;
+    protected byte score;
 
     public abstract void setHand(ArrayList <Card> hand);
 
@@ -31,10 +31,10 @@ public abstract class Player {
     protected void calculateScore() {
         //
         boolean hasAce = false;
-        int tempScore = 0;
+        byte tempScore = 0;
 
         for (int i = 0; i < hand.size(); i++) {
-            int rank = hand.get(i).getRank();
+            byte rank = hand.get(i).getRank();
 
             if (rank == 0) {
                 hasAce = true;
@@ -53,7 +53,7 @@ public abstract class Player {
         score = tempScore;
     }
 
-    public int getScore() {
+    public byte getScore() {
         return score;
     }
 
@@ -67,5 +67,5 @@ public abstract class Player {
     // play() method will be defined in inheriting classes
     // will return an int representing action taken by the player
     // (as specified in static final fields)
-    public abstract int play();
+    public abstract byte play();
 }

@@ -12,7 +12,7 @@ public class Deck {
     // and will be drawn next
     private int onCard = 0;
     // nOfCardsLeft field stores information of number of cards left for each rank
-    private int[] nOfCardsLeft = new int[13];
+    private short[] nOfCardsLeft = new short[13];
 
 
     public Deck(int nOfDecks) {
@@ -28,8 +28,8 @@ public class Deck {
         // populating the deck
 
         for (int i = 0; i < nOfDecks; i++) {
-            for (int j = 0; j < 13; j++) {
-                for (int k = 0; k < 4; k++) {
+            for (byte j = 0; j < 13; j++) {
+                for (byte k = 0; k < 4; k++) {
                     cards[cardIndex] = new Card(j, k);
                     cardIndex++;
                 }
@@ -37,7 +37,7 @@ public class Deck {
         }
         shuffle();
 
-        Arrays.fill(nOfCardsLeft, 4 * nOfDecks);
+        Arrays.fill(nOfCardsLeft, (short) (4 *  nOfDecks));
     }
 
     public Card deal() {
@@ -70,14 +70,14 @@ public class Deck {
 
     public void reshuffle(){
         onCard = 0;
-        Arrays.fill(nOfCardsLeft, deckSize / 13);
+        Arrays.fill(nOfCardsLeft, (short) (deckSize / 13));
         shuffle();
     }
 
-    public int[] getCardsLeftSimplified() {
+    public short[] getCardsLeftSimplified() {
 
         // this method returns int array containing information about the number of cards left in the deck
-        int[] cardsSimplified = new int[10];
+        short[] cardsSimplified = new short[10];
         System.arraycopy(nOfCardsLeft, 0, cardsSimplified, 0, 9);
 
         cardsSimplified[9] = 0;

@@ -9,11 +9,11 @@ import java.util.concurrent.atomic.AtomicReference;
 public class BlackjackUtil {
 
     // NEGLIGIBLE_THRESHOLD determines when probability is so small that case can be not considered
-    public static final double NEGLIGIBLE_THRESHOLD = 0.0005;
-    public static final int MAX_RECURSIONS = 4;
+    public static final float NEGLIGIBLE_THRESHOLD = 0.0005f;
+    public static final byte MAX_RECURSIONS = 4;
     private static final BlackjackUtil instance = new BlackjackUtil();
 
-    private final double[] dealerScoreProbabilities = new double[6];
+    private final float[] dealerScoreProbabilities = new float[6];
     // this field stores information of how likely is the dealer to end the game on a score
     // it is to be interpreted as :
     // [0] - 17 points
@@ -30,17 +30,17 @@ public class BlackjackUtil {
         return instance;
     }
 
-    public int calculateScore(int[] cardRanks) {
+    public byte calculateScore(byte[] cardRanks) {
 
         // works for cards represented as
         // 0 : Ace
         // 1 - 8 : cards from 2 to 9
         // 9 : 10, J, Q and K
 
-        int score = 0;
+        byte score = 0;
         boolean hasAce = false;
 
-        for (int n : cardRanks) {
+        for (byte n : cardRanks) {
             if (n == 0) {
                 hasAce = true;
             }
@@ -55,30 +55,34 @@ public class BlackjackUtil {
         return score;
     }
 
-    public double[] getDealerScoreProbabilities() {
+    public float[] getDealerScoreProbabilities() {
         return dealerScoreProbabilities;
     }
 
-    public void calculateDealerProbabilities(int dealerCard, int[] cardsInDeck) {
+    public void calculateDealerProbabilities(byte dealerCard, short[] cardsInDeck) {
 
         // clearing array
-        Arrays.fill(dealerScoreProbabilities, 0.0);
+        Arrays.fill(dealerScoreProbabilities, 0.0f);
 
         // calculating probabilities of cards to come up
-        int numberOfCardsLeft = Arrays.stream(cardsInDeck).sum();
+        short numberOfCardsLeft = 0;
 
-        double[] cardProbabilities = new double[10];
+        for (short n : cardsInDeck) {
+            numberOfCardsLeft += n;
+        }
+
+        float[] cardProbabilities = new float[10];
 
         for (int i = 0; i < 10; i++) {
-            cardProbabilities[i] = (double) cardsInDeck[i] / (double) numberOfCardsLeft;
+            cardProbabilities[i] = (float) cardsInDeck[i] / (float) numberOfCardsLeft;
         }
 
         // computing in parallel for any possible pair of cards
 
         CountDownLatch latch = new CountDownLatch(10);
-        for (int i = 0; i < 10; i++) {
+        for (byte i = 0; i < 10; i++) {
             {
-                int finalI = i;
+                byte finalI = i;
                 Thread thread = new Thread(() -> {
 
                     // Checking for edge case where there are no cards of this rank left
@@ -88,8 +92,8 @@ public class BlackjackUtil {
                     }
 
                     // making new dealer's hand
-                    int[] newHand = {dealerCard, finalI};
-                    int tempScore = calculateScore(newHand);
+                    byte[] newHand = {dealerCard, finalI};
+                    byte tempScore = calculateScore(newHand);
 
                     // checking if the dealer is at least 17 points
                     // NOTE : it is impossible to bust with only 2 cards (max score with 2 cards is 21)
@@ -105,7 +109,7 @@ public class BlackjackUtil {
                     }
 
                     // executes if dealer hits
-                    int[] newDeck = cardsInDeck.clone();
+                    short[] newDeck = cardsInDeck.clone();
                     newDeck[finalI]--;
                     calculatePossibleDealerHands(newHand, newDeck, cardProbabilities[finalI]);
 
@@ -125,21 +129,25 @@ public class BlackjackUtil {
         }
     }
 
-    private void calculatePossibleDealerHands(int[] dealerCards, int[] cardsInDeck, double caseProbability) {
+    private void calculatePossibleDealerHands(byte[] dealerCards, short[] cardsInDeck, float caseProbability) {
 
-        int numberOfCardsLeft = Arrays.stream(cardsInDeck).sum();
+        int numberOfCardsLeft = 0;
 
-        double[] cardProbabilities = new double[10];
+        for (short n : cardsInDeck) {
+            numberOfCardsLeft += n;
+        }
 
-        for (int i = 0; i < 10; i++) {
-            cardProbabilities[i] = (double) cardsInDeck[i] / (double) numberOfCardsLeft;
+        float[] cardProbabilities = new float[10];
+
+        for (byte i = 0; i < 10; i++) {
+            cardProbabilities[i] = (float) cardsInDeck[i] / (float) numberOfCardsLeft;
         }
 
         // analyzing all possible cases recursively in parallel
         CountDownLatch latch = new CountDownLatch(10);
 
-        for (int i = 0; i < 10; i++) {
-            int finalI = i;
+        for (byte i = 0; i < 10; i++) {
+            byte finalI = i;
             Thread thread = new Thread(() -> {
 
                 // checking for edge case - if there are no cards of such rank left in deck
@@ -149,7 +157,7 @@ public class BlackjackUtil {
                 }
 
                 // making new hand (by adding new card of specified index and checking if dealer still has play
-                int[] newHand = Arrays.copyOf(dealerCards, dealerCards.length + 1);
+                byte[] newHand = Arrays.copyOf(dealerCards, dealerCards.length + 1);
                 newHand[newHand.length - 1] = finalI;
                 int tempScore = calculateScore(newHand);
 
@@ -163,7 +171,7 @@ public class BlackjackUtil {
                     return;
                 }
 
-                double futureCaseProbability = cardProbabilities[finalI] * caseProbability;
+                float futureCaseProbability = cardProbabilities[finalI] * caseProbability;
 
                 // checking if recursive call is reasonable
                 if (futureCaseProbability < NEGLIGIBLE_THRESHOLD) {
@@ -172,7 +180,7 @@ public class BlackjackUtil {
                 }
 
                 // executes if dealer hits - recursive call
-                int[] newDeck = cardsInDeck.clone();
+                short[] newDeck = cardsInDeck.clone();
                 newDeck[finalI]--;
                 calculatePossibleDealerHands(newHand, newDeck, futureCaseProbability);
 
@@ -190,55 +198,55 @@ public class BlackjackUtil {
         }
     }
 
-    public double calculatePlayerWinningChances(int[] cardsLeft) {
+    public float calculatePlayerWinningChances(short[] cardsLeft) {
 
         // !NOTE : this method resets dealerScoreProbabilities
         // run calculateDealersScoreProbabilities after using this method
 
-        int nOfCardsLeft = 0;
+        short nOfCardsLeft = 0;
 
-        for (int n : cardsLeft) {
+        for (short n : cardsLeft) {
             nOfCardsLeft += n;
         }
 
-        double[][] winProbMatrix = new double[10][10];
+        float[][] winProbMatrix = new float[10][10];
 
-        double[] cardProbabilities = new double[10];
+        float[] cardProbabilities = new float[10];
 
         for (int i = 0; i < 10; i++) {
-            cardProbabilities[i] = (double) cardsLeft[i] / (double) nOfCardsLeft;
+            cardProbabilities[i] = (float) cardsLeft[i] / (float) nOfCardsLeft;
         }
 
-        Arrays.fill(dealerScoreProbabilities, 0.0);
+        Arrays.fill(dealerScoreProbabilities, 0.0f);
 
-        calculatePossibleDealerHands(new int[]{}, cardsLeft, 1.0);
+        calculatePossibleDealerHands(new byte[]{}, cardsLeft, 1.0f);
 
         CountDownLatch latch = new CountDownLatch(55);
 
-        for (int i = 0; i < 10; i++) {
-            for (int j = i; j < 10; j++) {
-                int finalI = i; int finalJ = j;
+        for (byte i = 0; i < 10; i++) {
+            for (byte j = i; j < 10; j++) {
+                byte finalI = i; byte finalJ = j;
                 Thread thread = new Thread(() -> {
-                    double standWinProb = 0.0;
+                    float standWinProb = 0.0f;
 
-                    int tempScore = calculateScore(new int[]{finalI, finalJ});
+                    byte tempScore = calculateScore(new byte[]{finalI, finalJ});
 
-                    for (int k = 0; k < tempScore - 17; k++) {
+                    for (byte k = 0; k < tempScore - 17; k++) {
                         standWinProb += dealerScoreProbabilities[k];
                     }
                     standWinProb += dealerScoreProbabilities[5];
 
-                    double oneHitWinProb = 0.0;
+                    float oneHitWinProb = 0.0f;
 
-                    for (int k = 0; k < 10; k++) {
-                        int inLoopScore = calculateScore(new int[]{finalI, finalJ, k});
+                    for (byte k = 0; k < 10; k++) {
+                        byte inLoopScore = calculateScore(new byte[]{finalI, finalJ, k});
                         // breaking the loop whe player goes bust
-                        if (inLoopScore > 21) {
+                        if (inLoopScore > 21) { //exiting the loop when player goes bust
                             k = 16;
                             continue;
                         }
-                        double inLoopWinProb = 0.0;
-                        for (int l = 0; l < inLoopScore - 17; l++) {
+                        float inLoopWinProb = 0.0f;
+                        for (byte l = 0; l < inLoopScore - 17; l++) {
                             inLoopWinProb += dealerScoreProbabilities[l];
                         }
                         inLoopWinProb += dealerScoreProbabilities[5];
@@ -254,21 +262,21 @@ public class BlackjackUtil {
             }
         }
 
-        double[][] CardProbMatrix = new double[10][10];
-        for (int i = 0; i < 10; i++) {
-            for (int j = i + 1; j < 10; j++) {
+        float[][] CardProbMatrix = new float[10][10];
+        for (byte i = 0; i < 10; i++) {
+            for (byte j = (byte) (i + 1); j < 10; j++) {
                 // calculating the upper half of the matrix
-                CardProbMatrix[i][j] = (double) (cardsLeft[i] * cardsLeft[j])
-                        / (double) (nOfCardsLeft * (nOfCardsLeft - 1));
+                CardProbMatrix[i][j] = (float) (cardsLeft[i] * cardsLeft[j])
+                        / (float) (nOfCardsLeft * (nOfCardsLeft - 1));
                 // that is identical to the bottom half of the matrix;
                 CardProbMatrix[j][i] = CardProbMatrix[i][j];
             }
         }
 
         // now the diagonal
-        for (int i = 0; i < 10; i++) {
-            CardProbMatrix[i][i] = (double) (cardsLeft[i] * (cardsLeft[i] - 1)) /
-                    (double) (nOfCardsLeft * (nOfCardsLeft - 1));
+        for (byte i = 0; i < 10; i++) {
+            CardProbMatrix[i][i] = (float) (cardsLeft[i] * (cardsLeft[i] - 1)) /
+                    (float) (nOfCardsLeft * (nOfCardsLeft - 1));
         }
 
         try {
@@ -277,10 +285,10 @@ public class BlackjackUtil {
             e.printStackTrace();
         }
 
-        double playerWinningProb = 0.0;
+        float playerWinningProb = 0.0f;
 
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
+        for (byte i = 0; i < 10; i++) {
+            for (byte j = 0; j < 10; j++) {
                 playerWinningProb += CardProbMatrix[i][j] * winProbMatrix[i][j];
             }
         }
@@ -288,49 +296,48 @@ public class BlackjackUtil {
         return playerWinningProb;
     }
 
-    public double calculateHitWinProbability(int[] cardsInHand, int[] cardsInDeck, int cardsLeft, int recursionNumber) {
+    public float calculateHitWinProbability(byte[] cardsInHand, short[] cardsInDeck, short cardsLeft, byte recursionNumber) {
         // returning if reached maximum search depth;
         if (recursionNumber == MAX_RECURSIONS) {
-            return 0.0;
+            return 0.0f;
         }
 
         //calculating probabilities of getting cards
-        double[] cardProbabilities = new double[10];
+        float[] cardProbabilities = new float[10];
 
         for (int i = 0; i < 10; i++) {
-            cardProbabilities[i] = (double) cardsInDeck[i] / (double) cardsLeft;
+            cardProbabilities[i] = (float) cardsInDeck[i] / (float) cardsLeft;
         }
 
-        AtomicReference<Double> winProb = new AtomicReference<>(0.0);
+        AtomicReference<Float> winProb = new AtomicReference<>(0.0f);
 
         // multithreading here
         CountDownLatch latch = new CountDownLatch(10);
 
-        for (int i = 0; i < 10; i++) {
-            int finalI = i;
+        for (byte i = 0; i < 10; i++) {
+            byte finalI = i;
 
             Thread thread = new Thread(() -> {
 
                 // end if no cards of rank left
                 if (cardsInDeck[finalI] == 0){
-                    winProb.set(0.0);
                     latch.countDown();
                     return;
                 }
 
-                int[] newHand = Arrays.copyOf(cardsInHand, cardsInHand.length + 1);
+                byte[] newHand = Arrays.copyOf(cardsInHand, cardsInHand.length + 1);
                 newHand[newHand.length - 1] = finalI;
 
                 int tempScore = BlackjackUtil.getInstance().calculateScore(newHand);
 
                 // bust
                 if (tempScore > 21) {
-                    winProb.set(0.0);
+                    winProb.set(0.0f);
                     latch.countDown();
                     return;
                 }
 
-                double standNowWinProbability = 0.0;
+                float standNowWinProbability = 0.0f;
 
                 for (int j = 0; j < tempScore - 17 ; j++) {
                     standNowWinProbability += dealerScoreProbabilities[j];
@@ -338,11 +345,11 @@ public class BlackjackUtil {
 
                 standNowWinProbability += dealerScoreProbabilities[5];
 
-                int[] newDeck = Arrays.copyOf(cardsInDeck, cardsInDeck.length);
+                short[] newDeck = Arrays.copyOf(cardsInDeck, cardsInDeck.length);
                 newDeck[finalI]--;
 
-                double hitMoreWinProbability =
-                        calculateHitWinProbability(newHand, newDeck, cardsLeft - 1, recursionNumber + 1);
+                float hitMoreWinProbability =
+                        calculateHitWinProbability(newHand, newDeck, (short) (cardsLeft - 1), (byte) (recursionNumber + 1));
 
                 winProb.set(winProb.get() +
                         cardProbabilities[finalI] * standNowWinProbability > hitMoreWinProbability ?

@@ -8,15 +8,15 @@ public class Card {
             {"CLUBS", "DIAMONDS", "HEARTS", "SPADES"};
     public final static char[] SUIT_SYMBOLS =
             {'♣', '♦', '♥', '♠'};
-    private int rank;
-    private int suit;
+    private byte rank;
+    private byte suit;
 
-    public Card(int rankIndex, int suitIndex) {
+    public Card(byte rankIndex, byte suitIndex) {
         rank = rankIndex;
         suit = suitIndex;
     }
 
-    public int getRank() {
+    public byte getRank() {
         return rank;
     }
 
@@ -24,7 +24,7 @@ public class Card {
         return RANKS[rank];
     }
 
-    public int getSuit() {
+    public byte getSuit() {
         return suit;
     }
 
