@@ -11,7 +11,8 @@ public class ComputerPlayer extends Player{
     private int money;
     // this field is used to store the move computed by
     private int optimalMove;
-    private final int MAX_RECURSIONS = 4;
+    private final int MAX_RECURSIONS = 5;
+
     public ComputerPlayer(int money){
         this.money = money;
     }
@@ -144,7 +145,7 @@ public class ComputerPlayer extends Player{
                     firstHitWinProbability.set(firstHitWinProbability.get() +
                             oneHitWinProbability * cardProbabilities[finalI] );
 
-                    System.out.println("firstHitWinProbability : " + firstHitWinProbability.get());
+                    //System.out.println("firstHitWinProbability : " + firstHitWinProbability.get());
                 } else { // bust
                     latch.countDown();
                     return;
@@ -153,16 +154,26 @@ public class ComputerPlayer extends Player{
                     int [] newDeck = Arrays.copyOf(cardsLeft, cardsLeft.length);
                     newDeck[finalI]--;
 
-                    hitWinProbability.set(hitWinProbability.get() + cardProbabilities[finalI] *
-                            calculateHitWinProbability(newHand, newDeck, finalNOfCardsLeft - 1, 0));
+                    final double thisHitWinProb = cardProbabilities[finalI] *
+                            calculateHitWinProbability(newHand, newDeck, finalNOfCardsLeft - 1, 0);
 
-                    System.out.println("hitWinProbability : " + hitWinProbability.get());
+                    hitWinProbability.set(hitWinProbability.get() + thisHitWinProb);
+
+                    //System.out.println("hitWinProbability : " + hitWinProbability.get());
 
                     latch.countDown();
             });
+
+            thread.start();
             }
 
-        
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
 
         expectedValues[HIT] =  2.0 * hitWinProbability.get() - 1.0;
 
@@ -223,20 +234,19 @@ public class ComputerPlayer extends Player{
 
         double[] dealerScoreProbabilities = BlackjackUtil.getInstance().getDealerScoreProbabilities();
 
-        double winProb = 0.0;
+        AtomicReference<Double> winProb = new AtomicReference<>(0.0);
 
         // multithreading here
         CountDownLatch latch = new CountDownLatch(10);
 
         for (int i = 0; i < 10; i++) {
             int finalI = i;
-            AtomicReference<Double> tempWinProb = new AtomicReference<>(0.0);
 
             Thread thread = new Thread(() -> {
 
                 // end if no cards of rank left
                 if (cardsInDeck[finalI] == 0){
-                    tempWinProb.set(0.0);
+                    winProb.set(0.0);
                     latch.countDown();
                     return;
                 }
@@ -248,7 +258,7 @@ public class ComputerPlayer extends Player{
 
                 // bust
                 if (tempScore > 21) {
-                    tempWinProb.set(0.0);
+                    winProb.set(0.0);
                     latch.countDown();
                     return;
                 }
@@ -267,16 +277,16 @@ public class ComputerPlayer extends Player{
                 double hitMoreWinProbability =
                         calculateHitWinProbability(newHand, newDeck, cardsLeft - 1, recursionNumber + 1);
 
-                tempWinProb.set(cardProbabilities[finalI] * standNowWinProbability > hitMoreWinProbability ?
+                winProb.set(winProb.get() +
+                        cardProbabilities[finalI] * standNowWinProbability > hitMoreWinProbability ?
                         standNowWinProbability : hitMoreWinProbability);
+
 
                 latch.countDown();
 
             });
 
             thread.start();
-
-            winProb += tempWinProb.get();
         }
 
         try {
@@ -285,7 +295,7 @@ public class ComputerPlayer extends Player{
             e.printStackTrace();
         }
 
-        return  winProb;
+        return  winProb.get();
     }
 
     public void winMoney(int winnings) {
