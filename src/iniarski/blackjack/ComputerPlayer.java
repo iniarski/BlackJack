@@ -11,7 +11,7 @@ public class ComputerPlayer extends Player{
     private int money;
     // this field is used to store the move computed by
     private int optimalMove;
-    private final int MAX_RECURSIONS = 5;
+    private final int MAX_RECURSIONS = 3;
 
     public ComputerPlayer(int money){
         this.money = money;
