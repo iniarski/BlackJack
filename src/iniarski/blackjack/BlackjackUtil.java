@@ -299,9 +299,6 @@ public class BlackjackUtil {
 
     public float calculateHitWinProbability(byte[] cardsInHand, short[] cardsInDeck, short cardsLeft, byte recursionNumber) {
         // returning if reached maximum search depth;
-        if (recursionNumber == MAX_RECURSIONS) {
-            return 0.0f;
-        }
 
         //calculating probabilities of getting cards
         float[] cardProbabilities = new float[10];
@@ -350,8 +347,15 @@ public class BlackjackUtil {
                 short[] newDeck = Arrays.copyOf(cardsInDeck, cardsInDeck.length);
                 newDeck[finalI]--;
 
-                float hitMoreWinProbability =
-                        calculateHitWinProbability(newHand, newDeck, (short) (cardsLeft - 1), (byte) (recursionNumber + 1));
+                float hitMoreWinProbability;
+
+                if (recursionNumber == MAX_RECURSIONS - 1) {
+                    hitMoreWinProbability = standNowWinProbability;
+                } else {
+                    hitMoreWinProbability =
+                            calculateHitWinProbability(newHand, newDeck, (short) (cardsLeft - 1), (byte) (recursionNumber + 1));
+                }
+
 
                 winProb.set(winProb.get() +
                         cardProbabilities[finalI] * standNowWinProbability > hitMoreWinProbability ?
