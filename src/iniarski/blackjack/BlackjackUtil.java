@@ -314,8 +314,8 @@ public class BlackjackUtil {
 
         // multithreading here
         CountDownLatch latch = new CountDownLatch(10);
-        // the stack size will be smaller in consecutive recursive calls (never 0)
-        long threadStackSize = (MAX_RECURSIONS - recursionNumber) * BYTES_IN_MEGABYTE;
+        // the stack size will be smaller in consecutive recursive calls
+        long threadStackSize = (MAX_RECURSIONS - recursionNumber + 2) * BYTES_IN_MEGABYTE;
 
         for (byte i = 0; i < 10; i++) {
             byte finalI = i;
