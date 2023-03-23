@@ -204,18 +204,20 @@ public class BlackjackUtil {
         // !NOTE : this method resets dealerScoreProbabilities
         // run calculateDealersScoreProbabilities after using this method
 
-        short nOfCardsLeft = 0;
+        short tempNOfCardsLeft = 0;
 
         for (short n : cardsLeft) {
-            nOfCardsLeft += n;
+            tempNOfCardsLeft += n;
         }
+
+        final short nOfCardsLeft = tempNOfCardsLeft;
 
         float[][] winProbMatrix = new float[10][10];
 
         float[] cardProbabilities = new float[10];
 
         for (int i = 0; i < 10; i++) {
-            cardProbabilities[i] = (float) cardsLeft[i] / (float) nOfCardsLeft;
+            cardProbabilities[i] = (float) cardsLeft[i] / (float) tempNOfCardsLeft;
         }
 
         Arrays.fill(dealerScoreProbabilities, 0.0f);
@@ -237,24 +239,11 @@ public class BlackjackUtil {
                     }
                     standWinProb += dealerScoreProbabilities[5];
 
-                    float oneHitWinProb = 0.0f;
+                    float hitWinProb = calculateHitWinProbability(new byte[]{finalI, finalJ}, cardsLeft, nOfCardsLeft, (byte) 1);
 
-                    for (byte k = 0; k < 10; k++) {
-                        byte inLoopScore = calculateScore(new byte[]{finalI, finalJ, k});
-                        // breaking the loop whe player goes bust
-                        if (inLoopScore > 21) { //exiting the loop when player goes bust
-                            k = 16;
-                            continue;
-                        }
-                        float inLoopWinProb = 0.0f;
-                        for (byte l = 0; l < inLoopScore - 17; l++) {
-                            inLoopWinProb += dealerScoreProbabilities[l];
-                        }
-                        inLoopWinProb += dealerScoreProbabilities[5];
-                        oneHitWinProb += inLoopWinProb * cardProbabilities[k];
-                    }
 
-                    winProbMatrix[finalI][finalJ] = Math.max(standWinProb, oneHitWinProb);
+                    winProbMatrix[finalI][finalJ] = Math.max(standWinProb, hitWinProb);
+                    winProbMatrix[finalJ][finalI] = winProbMatrix[finalI][finalJ];
 
                     latch.countDown();
                 });
@@ -268,7 +257,7 @@ public class BlackjackUtil {
             for (byte j = (byte) (i + 1); j < 10; j++) {
                 // calculating the upper half of the matrix
                 CardProbMatrix[i][j] = (float) (cardsLeft[i] * cardsLeft[j])
-                        / (float) (nOfCardsLeft * (nOfCardsLeft - 1));
+                        / (float) (tempNOfCardsLeft * (tempNOfCardsLeft - 1));
                 // that is identical to the bottom half of the matrix;
                 CardProbMatrix[j][i] = CardProbMatrix[i][j];
             }
@@ -277,7 +266,7 @@ public class BlackjackUtil {
         // now the diagonal
         for (byte i = 0; i < 10; i++) {
             CardProbMatrix[i][i] = (float) (cardsLeft[i] * (cardsLeft[i] - 1)) /
-                    (float) (nOfCardsLeft * (nOfCardsLeft - 1));
+                    (float) (tempNOfCardsLeft * (tempNOfCardsLeft - 1));
         }
 
         try {
