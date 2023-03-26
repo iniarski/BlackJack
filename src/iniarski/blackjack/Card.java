@@ -8,8 +8,8 @@ public class Card {
             {"CLUBS", "DIAMONDS", "HEARTS", "SPADES"};
     public final static char[] SUIT_SYMBOLS =
             {'♣', '♦', '♥', '♠'};
-    private byte rank;
-    private byte suit;
+    private final byte rank;
+    private final byte suit;
 
     public Card(byte rankIndex, byte suitIndex) {
         rank = rankIndex;
@@ -18,6 +18,10 @@ public class Card {
 
     public byte getRank() {
         return rank;
+    }
+
+    public byte getRankSimplified() {
+        return rank > 9 ? 9 : rank;
     }
 
     public char getRankAsChar() {
