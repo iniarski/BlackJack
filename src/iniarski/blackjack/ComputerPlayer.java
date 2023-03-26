@@ -231,4 +231,8 @@ public class ComputerPlayer extends Player{
     public int getMoney() {
         return money;
     }
+
+    public ArrayList<Card> getHand() {
+        return hand;
+    }
 }
