@@ -15,7 +15,6 @@ public class Game {
     protected int startingMoney = 250;
     protected int handsPlayed = 20;
 
-    // TODO : write game logic
     void start() {
         Dealer dealer = new Dealer();
         ComputerPlayer player = new ComputerPlayer(startingMoney);

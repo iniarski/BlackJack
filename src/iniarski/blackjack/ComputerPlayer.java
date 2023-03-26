@@ -40,10 +40,8 @@ public class ComputerPlayer extends Player{
     public int bet(int minBet, int maxBet, short[] cardsLeft) {
 
         float winProb = BlackjackUtil.getInstance().calculatePlayerWinningChances(cardsLeft);
-        System.out.println("Player win probability : " + winProb);
 
         // optimal bet fraction derived from Kelly's criterion
-
         float betFraction = 2.0f * winProb - 1.0f;
 
         int preferredBet = (int) (money * betFraction);
@@ -93,8 +91,6 @@ public class ComputerPlayer extends Player{
         float[] expectedValues = new float[5];
         float[] dealerProbabilities = BlackjackUtil.getInstance().getDealerScoreProbabilities();
 
-        System.out.println("Dealer score probabilities");
-        System.out.println(Arrays.toString(dealerProbabilities));
 
         // 0 - STAND
         float standWinProbability = 0.0f;
@@ -206,9 +202,6 @@ public class ComputerPlayer extends Player{
 
         // looking for the highest expected value
         byte maxIndex = 0;
-
-        System.out.println("Expected values : ");
-        System.out.println(Arrays.toString(expectedValues));
 
         for (byte i = 1; i < 5; i++) {
             if (expectedValues[i] > expectedValues[maxIndex]) {
