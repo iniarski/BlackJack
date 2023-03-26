@@ -82,7 +82,7 @@ public class ComputerPlayer extends Player{
         byte[] cardsInHand = new byte[hand.size()];
 
         for (int i = 0; i < hand.size(); i++) {
-            cardsInHand[i] = hand.get(i).getRank();
+            cardsInHand[i] = hand.get(i).getRankSimplified();
         }
 
 

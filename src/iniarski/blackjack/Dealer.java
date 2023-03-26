@@ -25,7 +25,7 @@ public class Dealer extends Player{
     }
 
     public byte getRevealedCard() {
-        return hand.get(0).getRank();
+        return hand.get(0).getRankSimplified();
     }
 
     @Override
