@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ComputerPlayer extends Player{
 
     public final static float NOT_POSSIBLE = -128.0f;
+    public static boolean CAN_SPLIT = true;
     private int money;
     // this field is used to store the move computed by
     private byte optimalMove;
@@ -70,9 +71,9 @@ public class ComputerPlayer extends Player{
         // Calculating probability of getting each card
 
         float[] cardProbabilities = new float[10];
-        int nOfCardsLeft = 0;
+        short nOfCardsLeft = 0;
 
-        for (int n : cardsLeft) {
+        for (short n : cardsLeft) {
             nOfCardsLeft += n;
         }
         for (int i = 0; i < 10; i++) {
@@ -185,9 +186,19 @@ public class ComputerPlayer extends Player{
         }
 
         // 3 - SPLIT
-        // TODO : splitting
 
-        expectedValues[SPLIT] = NOT_POSSIBLE;
+        // conditions for splitting :
+        // 1. first move of the hand
+        // 2. two identical cards in hand
+        // 3. does not play from a split hand (the CAN_SPLIT field)
+
+        if (hand.size() == 2 && hand.get(0).getRank() == hand.get(1).getRank()
+        && CAN_SPLIT) {
+            expectedValues[SPLIT] = BlackjackUtil.getInstance().calculateHitWinProbability(
+                    cardsInHand, cardsLeft, nOfCardsLeft, (byte) 0) * 2.0f - 1.0f;
+        } else {
+            expectedValues[SPLIT] = NOT_POSSIBLE;
+        }
 
         // 4 - SURRENDER
         // surrendering means forfeiting half original bet
