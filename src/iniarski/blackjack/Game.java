@@ -85,7 +85,7 @@ public class Game {
                         firstHand.setHand(playersHand.get(0), deck.deal());
                         secondHand.setHand(playersHand.get(1), deck.deal());
 
-                        System.out.println("Player splits! Player play with two hand, each with half original bet");
+                        System.out.println("Player splits! Player plays with two hand, each with half original bet");
 
                         BlackjackUtil.getInstance().
                                 calculateDealerProbabilities(dealer.getRevealedCard(), deck.getCardsLeftSimplified());
@@ -107,7 +107,7 @@ public class Game {
                         int firstHandBet = playerBet/2;
                         int secondHandBet = playerBet - firstHandBet;
 
-                        while (firstHandStillPlays && secondHandStillPlays) {
+                        while (firstHandStillPlays || secondHandStillPlays) {
 
                             if(firstHandStillPlays) {
                                 switch (firstHand.play()) {
@@ -143,7 +143,7 @@ public class Game {
 
                                 if(firstHand.getScore() > 21) {
                                     System.out.println("First hand is bust");
-                                    secondHandStillPlays = false;
+                                    firstHandStillPlays = false;
                                     firstHandWaitsForDealer = false;
                                 }
 
@@ -176,7 +176,7 @@ public class Game {
                                     case Player.SURRENDER:
                                         secondHandStillPlays = false;
                                         firstHandWaitsForDealer = false;
-                                        System.out.println("Player surrenders with first hand.");
+                                        System.out.println("Player surrenders with second hand.");
                                         player.winMoney(secondHandBet / 2);
                                         break;
                                 }
@@ -192,6 +192,13 @@ public class Game {
                             if (firstHandStillPlays || secondHandStillPlays) {
                                 BlackjackUtil.getInstance().
                                         calculateDealerProbabilities(dealer.getRevealedCard(), deck.getCardsLeftSimplified());
+                                if(firstHandStillPlays) {
+                                    firstHand.calculateBestMove(deck.getCardsLeftSimplified());
+                                }
+                                if (secondHandStillPlays) {
+                                    secondHand.calculateBestMove(deck.getCardsLeftSimplified());
+                                }
+                                continue;
                             }
 
                             if (firstHandWaitsForDealer || secondHandWaitsForDealer) {
