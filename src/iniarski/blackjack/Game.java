@@ -1,6 +1,7 @@
 package iniarski.blackjack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Game {
     // fields for holding game rules
@@ -28,6 +29,12 @@ public class Game {
         Deck deck = new Deck(nOfDecks);
 
         for (int i = 0; i < handsPlayed; i++) {
+
+            if (player.getMoney() < minBet) {
+                // if players runs out of money the game ends
+                Arrays.fill(moneyHistogram, i, handsPlayed - 1, player.getMoney());
+                break;
+            }
 
             System.out.println("Hand : " + (i + 1) + "\n");
 
