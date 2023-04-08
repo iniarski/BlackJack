@@ -14,7 +14,7 @@ public class Game {
 
     protected short nOfDecks = 4;
     protected int minBet = 10;
-    protected int maxBet = 100;
+    protected int maxBet = 50;
     protected int startingMoney = 250;
     protected int handsPlayed = 30;
 
@@ -32,7 +32,7 @@ public class Game {
 
             if (player.getMoney() < minBet) {
                 // if players runs out of money the game ends
-                Arrays.fill(moneyHistogram, i, handsPlayed - 1, player.getMoney());
+                Arrays.fill(moneyHistogram, i, handsPlayed, player.getMoney());
                 break;
             }
 
@@ -53,6 +53,7 @@ public class Game {
                 deck.revealFaceDownCard(dealer.revealCard());
                 System.out.println("Dealer has 21 points and wins the hand");
                 dealer.printHand();
+                moneyHistogram[i] = player.getMoney();
                 continue;
             }
 
@@ -234,6 +235,7 @@ public class Game {
                             ComputerPlayer.CAN_SPLIT = true;
 
                             System.out.println("Player's money : " + player.getMoney() + "\n");
+                            moneyHistogram[i] = player.getMoney();
                         }
                     }
                     case Player.SURRENDER -> {
@@ -241,6 +243,7 @@ public class Game {
                         player.winMoney(playerBet / 2);
                         dealerMoves = false;
                         System.out.println("Player surrenders loosing half bet. New balance : " + player.getMoney());
+                        moneyHistogram[i] = player.getMoney();
                     }
                     default ->
                             System.out.println("You shouldn't be seeing this message - something went horribly wrong.");
@@ -254,6 +257,7 @@ public class Game {
             if (player.getScore() > 21) {
                 System.out.println("BUST - house wins");
                 System.out.println("Player's money : " + player.getMoney() + "\n");
+                moneyHistogram[i] = player.getMoney();
                 continue;
             }
 
