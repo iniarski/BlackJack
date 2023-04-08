@@ -4,15 +4,15 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class Deck {
-    final private int STANDARD_DECK_SIZE = 52;
+    final static int STANDARD_DECK_SIZE = 52;
 
-    private Card[] cards;
-    private int deckSize;
+    private final Card[] cards;
+    private final int deckSize;
     // onCard field hold information which card is on top of the deck
     // and will be drawn next
     private int onCard = 0;
     // nOfCardsLeft field stores information of number of cards left for each rank
-    private short[] nOfCardsLeft = new short[13];
+    private final short[] nOfCardsLeft = new short[13];
 
 
     public Deck(int nOfDecks) {
