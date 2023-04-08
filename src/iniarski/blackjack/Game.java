@@ -11,15 +11,19 @@ public class Game {
 
     }
 
-    protected short nOfDecks = 8;
+    protected short nOfDecks = 4;
     protected int minBet = 10;
     protected int maxBet = 100;
     protected int startingMoney = 250;
-    protected int handsPlayed = 20;
+    protected int handsPlayed = 30;
+
+    // field for storing player's money after each hand played
+    protected int[] moneyHistogram;
 
     void start() {
         Dealer dealer = new Dealer();
         ComputerPlayer player = new ComputerPlayer(startingMoney);
+        moneyHistogram = new int[handsPlayed];
 
         Deck deck = new Deck(nOfDecks);
 
@@ -282,9 +286,14 @@ public class Game {
             }
 
             System.out.println("Player's money : " + player.getMoney() + "\n");
+            moneyHistogram[i] = player.getMoney();
         }
 
         System.out.println("Game over");
+    }
+
+    public int[] getMoneyHistogram() {
+        return moneyHistogram;
     }
 
     public static void main(String[] args) {
