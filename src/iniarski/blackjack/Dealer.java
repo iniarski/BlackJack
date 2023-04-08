@@ -46,4 +46,9 @@ public class Dealer extends Player{
             System.out.println(hand.get(0) + ", face down card");
         }
     }
+
+    public boolean has21() {
+        calculateScore();
+        return score == 21;
+    }
 }

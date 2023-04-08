@@ -49,6 +49,13 @@ public class Game {
             dealer.setHand(deck.deal(), deck.dealFaceDownCard());
             dealer.printHand();
 
+            if (dealer.has21()) {
+                deck.revealFaceDownCard(dealer.revealCard());
+                System.out.println("Dealer has 21 points and wins the hand");
+                dealer.printHand();
+                continue;
+            }
+
             BlackjackUtil.getInstance().calculateDealerProbabilities(
                     dealer.getRevealedCard(), deck.getCardsLeftSimplified());
 
