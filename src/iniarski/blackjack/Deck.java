@@ -41,17 +41,28 @@ public class Deck {
     }
 
     public Card deal() {
-        // decrementing nOfCardLeft at index of the rank of cards
-        nOfCardsLeft[cards[onCard].getRank()]--;
-        // changing to next card
-        onCard++;
-        // returning the present card
-        return cards[onCard - 1];
+        try {
+            // decrementing nOfCardLeft at index of the rank of cards
+            nOfCardsLeft[cards[onCard].getRank()]--;
+            // changing to next card
+            onCard++;
+            // returning the present card
+            return cards[onCard - 1];
+        } catch (IndexOutOfBoundsException e) {
+            // exception happens when the deck run out of cards
+            reshuffle();
+            return deal();
+        }
     }
 
     public Card dealFaceDownCard() {
-        onCard++;
-        return  cards[onCard - 1];
+        try {
+            onCard++;
+            return cards[onCard - 1];
+        } catch (IndexOutOfBoundsException e) {
+            // similarly as in deal()
+            return dealFaceDownCard();
+        }
     }
 
     public void revealFaceDownCard(int rank){
