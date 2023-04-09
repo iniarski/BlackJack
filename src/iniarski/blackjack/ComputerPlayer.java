@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ComputerPlayer extends Player{
 
     public final static float NOT_POSSIBLE = -128.0f;
-    public static boolean CAN_SPLIT = true;
+    private boolean canSplit = true;
     private int money;
     // this field is used to store the move computed by
     private byte optimalMove;
@@ -193,7 +193,7 @@ public class ComputerPlayer extends Player{
         // 3. does not play from a split hand (the CAN_SPLIT field)
 
         if (hand.size() == 2 && hand.get(0).getRank() == hand.get(1).getRank()
-        && CAN_SPLIT) {
+        && canSplit) {
             expectedValues[SPLIT] = BlackjackUtil.getInstance().calculateHitWinProbability(
                     cardsInHand, cardsLeft, nOfCardsLeft, (byte) 0) * 2.0f - 1.0f;
         } else {
@@ -234,5 +234,9 @@ public class ComputerPlayer extends Player{
 
     public ArrayList<Card> getHand() {
         return hand;
+    }
+
+    public void setCanSplit(boolean canSplit) {
+        this.canSplit = canSplit;
     }
 }

@@ -95,7 +95,8 @@ public class Game {
 
                         ComputerPlayer firstHand = new ComputerPlayer(0);
                         ComputerPlayer secondHand = new ComputerPlayer(0);
-                        ComputerPlayer.CAN_SPLIT = false;
+                        firstHand.setCanSplit(false);
+                        secondHand.setCanSplit(false);
                         ArrayList<Card> playersHand = player.getHand();
                         firstHand.setHand(playersHand.get(0), deck.deal());
                         secondHand.setHand(playersHand.get(1), deck.deal());
@@ -232,7 +233,6 @@ public class Game {
 
                             playerMakesNextMove = false;
                             dealerMoves = false;
-                            ComputerPlayer.CAN_SPLIT = true;
 
                             System.out.println("Player's money : " + player.getMoney() + "\n");
                             moneyHistogram[i] = player.getMoney();
