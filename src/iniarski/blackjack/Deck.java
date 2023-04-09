@@ -61,6 +61,7 @@ public class Deck {
             return cards[onCard - 1];
         } catch (IndexOutOfBoundsException e) {
             // similarly as in deal()
+            reshuffle();
             return dealFaceDownCard();
         }
     }
