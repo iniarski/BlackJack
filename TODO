@@ -10,6 +10,7 @@
     parametry które podaje użytkownik
         - nOfDecks (liczba talii którymi będzie się grać int od 1 - 8)
         - handsPlayed (liczba rozegrany rozdań dodatni int)
+        - gamesPlayed - liczbaSymulacji
         - startingMoney (self-explanatory int)
         ( fajnie jeżeli)
         - fixedBetSize ( bool - czy jest jedna ustalona wysokość zakładu )
@@ -18,11 +19,23 @@
         (jeżeli nie)
             maxBet, minBet
             (da się zrobić fixedBet naokoło poprostu daje sie maxBet = minBet)
+        - canSplit, canDoubleDown, canSurrender - boole, zasady gry
 
-2. Wykresy (ambitne)
+
+2. Simulation
+    klasa, która odpali maina a w nim:
+        - wczyta parametry z RulesReader'a
+        - odpali na osobnych threadach Game.start i weźmie wyniki
+        - zrobi wykresy
+
+3. Wykresy
     znaleźć jakąś bibliotekę do rysowania wykresów
     zrobić wykres money(hand) dla n symulacji
     i wykres wartości średniej
+    ambitnie - prosta regresji i standardowe odchylenie
 
-3. (! wyjątkowo ambitne)
+4. Zapis do pliku (ambitne)
+    - wynik symulacji zapisany do np .csv
+
+5. (! wyjątkowo ambitne)
     Wykazać się kreatywnością i znaleźć coś do zrobienia

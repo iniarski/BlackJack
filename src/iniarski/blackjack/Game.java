@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Game {
-    // fields for holding game rules
-    // TODO : write class for reading and storing game rules in .properties file from which the values will be taken
-    // values should be read in constructor
 
     Game() {
-
+        // TODO: read rules
     }
 
+    // fields for holding game rules
     protected short nOfDecks = 4;
     protected int minBet = 10;
     protected int maxBet = 50;

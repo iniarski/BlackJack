@@ -9,12 +9,15 @@ public class ComputerPlayer extends Player{
 
     public final static float NOT_POSSIBLE = -128.0f;
     private boolean canSplit = true;
+    private boolean canDoubleDown = true;
+    private boolean canSurrender = true;
     private int money;
     // this field is used to store the move computed by
     private byte optimalMove;
 
     public ComputerPlayer(int money){
         this.money = money;
+        // TODO: read rules in constructor (canSplit etc.)
     }
 
 
@@ -179,7 +182,7 @@ public class ComputerPlayer extends Player{
         // probability with winning with one card was calculate previously
         // possible only if first move
 
-        if (hand.size() == 2) {
+        if (hand.size() == 2 && canDoubleDown) {
             expectedValues[DOUBLE_DOWN] = 4.0f * firstHitWinProbability.get() - 2.0f;
         } else {
             expectedValues[DOUBLE_DOWN] = NOT_POSSIBLE;
@@ -205,7 +208,7 @@ public class ComputerPlayer extends Player{
         // possible only on first move
 
         // hence :
-        if (hand.size() == 2) {
+        if (hand.size() == 2 && canSurrender) {
             expectedValues[SURRENDER] = -0.5f;
         } else {
             expectedValues[SURRENDER] = NOT_POSSIBLE;
