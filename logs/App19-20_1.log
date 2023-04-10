@@ -1,0 +1,6 @@
+19:20:13.054 [JavaFX Application Thread] INFO  - Button pressed
+19:20:13.057 [JavaFX Application Thread] INFO  - nOfDecks  = 12
+19:20:13.057 [JavaFX Application Thread] INFO  - minBet = 321
+19:20:13.058 [JavaFX Application Thread] INFO  - maxBet = 213
+19:20:13.058 [JavaFX Application Thread] INFO  - money = 21
+19:20:13.058 [JavaFX Application Thread] INFO  - Hands = 21
