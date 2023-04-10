@@ -4,6 +4,7 @@ package iniarski.blackjack;
 
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class BlackjackUtil {
@@ -204,6 +205,10 @@ public class BlackjackUtil {
         // !NOTE : this method resets dealerScoreProbabilities
         // run calculateDealersScoreProbabilities after using this method
 
+        // TODO: fix betting
+        // idk why but the calculated probability is usually to high and not consistent
+        // something to do wit threading, i guess
+
         short tempNOfCardsLeft = 0;
 
         for (short n : cardsLeft) {
@@ -287,7 +292,6 @@ public class BlackjackUtil {
     }
 
     public float calculateHitWinProbability(byte[] cardsInHand, short[] cardsInDeck, short cardsLeft, byte recursionNumber) {
-        // returning if reached maximum search depth;
 
         //calculating probabilities of getting cards
         float[] cardProbabilities = new float[10];
@@ -332,6 +336,7 @@ public class BlackjackUtil {
                 }
 
                 standNowWinProbability += dealerScoreProbabilities[5];
+                //standNowWinProbability += tempScore >= 17 ? dealerScoreProbabilities[tempScore - 17] / 2.0f : 0.0f;
 
                 short[] newDeck = Arrays.copyOf(cardsInDeck, cardsInDeck.length);
                 newDeck[finalI]--;

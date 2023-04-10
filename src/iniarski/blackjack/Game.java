@@ -171,11 +171,15 @@ public class Game {
                                 if (firstHandWaitsForDealer) {
                                     if (firstHand.getScore() > dealer.getScore() || dealer.getScore() > 21) {
                                         player.winMoney(2 * firstHandBet);
+                                    } else if (firstHand.getScore() == dealer.getScore()) {
+                                        player.winMoney(firstHandBet);
                                     }
                                 }
                                 if (secondHandWaitsForDealer) {
                                     if (secondHand.getScore() > dealer.getScore() || dealer.getScore() > 21) {
                                         player.winMoney(2 * secondHandBet);
+                                    } else if (secondHand.getScore() == dealer.getScore()) {
+                                        player.winMoney(secondHandBet);
                                     }
                                 }
                             }
@@ -216,6 +220,8 @@ public class Game {
             // player win condition
             if (dealer.getScore() > 21 || player.getScore() > dealer.getScore()) {
                 player.winMoney(2 * playerBet);
+            } else if (dealer.getScore() == player.getScore()) {
+                player.winMoney(playerBet);
             }
 
             moneyHistogram[i] = player.getMoney();
@@ -252,6 +258,13 @@ public class Game {
 
             if (dealer.has21()) {
                 deck.revealFaceDownCard(dealer.revealCard());
+                if (player.getScore() == 21) {
+                    System.out.println("Dealer and player have 21 from deal - Push");
+                    player.winMoney(playerBet);
+                    dealer.printHand();
+                    moneyHistogram[i] = player.getMoney();
+                    continue;
+                }
                 System.out.println("Dealer has 21 points and wins the hand");
                 dealer.printHand();
                 moneyHistogram[i] = player.getMoney();
@@ -418,6 +431,9 @@ public class Game {
                                     if (firstHand.getScore() > dealer.getScore() || dealer.getScore() > 21) {
                                         player.winMoney(2 * firstHandBet);
                                         System.out.println("First hand wins");
+                                    } else if (firstHand.getScore() == dealer.getScore()) {
+                                        System.out.println("First hand ties");
+                                        player.winMoney(firstHandBet);
                                     } else {
                                         System.out.println("Dealer wins with first hand");
                                     }
@@ -426,6 +442,9 @@ public class Game {
                                     if (secondHand.getScore() > dealer.getScore() || dealer.getScore() > 21) {
                                         player.winMoney(2 * secondHandBet);
                                         System.out.println("Second hand wins");
+                                    } else if (secondHand.getScore() == dealer. getScore()) {
+                                        System.out.println("Second hand ties with dealer");
+                                        player.winMoney(secondHandBet);
                                     } else {
                                         System.out.println("Dealer wins with second hand");
                                     }
@@ -478,6 +497,9 @@ public class Game {
             if (dealer.getScore() > 21 || player.getScore() > dealer.getScore()) {
                 System.out.println("Player wins");
                 player.winMoney(2 * playerBet);
+            } else if (dealer.getScore() == player.getScore()) {
+                System.out.println("Push");
+                player.winMoney(playerBet);
             } else {
                 System.out.println("The house wins");
             }

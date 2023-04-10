@@ -105,10 +105,12 @@ public class ComputerPlayer extends Player{
         // adding probability that dealer is bust
         standWinProbability += dealerProbabilities[5];
 
+        float standPushProbability = score >= 17 ? dealerProbabilities[score - 17] : 0.0f;
+
         // expected value of standing : ev = 1 * p - 1 * (1 - p) = 2p - 1
         // where p - probability of winning if standing
 
-        expectedValues[STAND] = 2.0f * standWinProbability - 1.0f;
+        expectedValues[STAND] = 2.0f * standWinProbability - 1.0f + standPushProbability;
 
         // 1 - HIT
 
