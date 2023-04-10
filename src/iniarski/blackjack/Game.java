@@ -36,6 +36,209 @@ public class Game {
                 break;
             }
 
+            int playerBet = player.bet(minBet, maxBet, deck.getCardsLeftSimplified());
+
+            player.setHand(deck.deal(), deck.deal());
+
+            dealer.setHand(deck.deal(), deck.dealFaceDownCard());
+
+            if (dealer.has21()) {
+                deck.revealFaceDownCard(dealer.revealCard());
+                moneyHistogram[i] = player.getMoney();
+                continue;
+            }
+
+            BlackjackUtil.getInstance().calculateDealerProbabilities(
+                    dealer.getRevealedCard(), deck.getCardsLeftSimplified());
+
+            boolean playerMakesNextMove = true;
+            boolean dealerMoves = true;
+
+            do {
+                player.calculateBestMove(deck.getCardsLeftSimplified());
+
+                switch (player.play()) {
+                    case Player.STAND -> {
+                        playerMakesNextMove = false;
+                    }
+                    case Player.HIT -> {
+                        player.addCard(deck.deal());
+                        if (player.getScore() > 21) {
+                            playerMakesNextMove = false;
+                        }
+                    }
+                    case Player.DOUBLE_DOWN -> {
+                        player.addCard(deck.deal());
+                        playerMakesNextMove = false;
+                        player.winMoney(-playerBet);
+                        playerBet = 2 * playerBet;
+                    }
+                    case Player.SPLIT -> {
+                        // making two new ComputerPlayer objects to play each of the hands
+
+                        ComputerPlayer firstHand = new ComputerPlayer(0);
+                        ComputerPlayer secondHand = new ComputerPlayer(0);
+                        firstHand.setCanSplit(false);
+                        secondHand.setCanSplit(false);
+                        ArrayList<Card> playersHand = player.getHand();
+                        firstHand.setHand(playersHand.get(0), deck.deal());
+                        secondHand.setHand(playersHand.get(1), deck.deal());
+                        BlackjackUtil.getInstance().
+                                calculateDealerProbabilities(dealer.getRevealedCard(), deck.getCardsLeftSimplified());
+                        firstHand.calculateBestMove(deck.getCardsLeftSimplified());
+                        secondHand.calculateBestMove(deck.getCardsLeftSimplified());
+                        boolean firstHandStillPlays = true;
+                        boolean secondHandStillPlays = true;
+                        boolean firstHandWaitsForDealer = true;
+                        boolean secondHandWaitsForDealer = true;
+                        int firstHandBet = playerBet / 2;
+                        int secondHandBet = playerBet - firstHandBet;
+                        while (firstHandStillPlays || secondHandStillPlays) {
+
+                            if (firstHandStillPlays) {
+                                switch (firstHand.play()) {
+                                    case Player.STAND -> {
+                                        firstHandStillPlays = false;
+                                    }
+                                    case Player.HIT -> {
+                                        firstHand.addCard(deck.deal());
+                                    }
+                                    case Player.DOUBLE_DOWN -> {
+                                        firstHand.addCard(deck.deal());
+                                        firstHandStillPlays = false;
+                                        player.winMoney(-firstHandBet);
+                                        firstHandBet = 2 * firstHandBet;
+                                    }
+                                    case Player.SURRENDER -> {
+                                        firstHandStillPlays = false;
+                                        firstHandWaitsForDealer = false;
+                                        player.winMoney(firstHandBet / 2);
+                                    }
+                                }
+
+                                if (firstHand.getScore() > 21) {
+                                    firstHandStillPlays = false;
+                                    firstHandWaitsForDealer = false;
+                                }
+
+                            }
+
+                            if (secondHandStillPlays) {
+                                switch (secondHand.play()) {
+                                    case Player.STAND -> {
+                                        secondHandStillPlays = false;
+                                    }
+                                    case Player.HIT -> {
+                                        secondHand.addCard(deck.deal());
+                                    }
+                                    case Player.DOUBLE_DOWN -> {
+                                        secondHand.addCard(deck.deal());
+                                        secondHandStillPlays = false;
+                                        player.winMoney(-secondHandBet);
+                                        secondHandBet = 2 * secondHandBet;
+                                    }
+                                    case Player.SURRENDER -> {
+                                        secondHandStillPlays = false;
+                                        firstHandWaitsForDealer = false;
+                                        player.winMoney(secondHandBet / 2);
+                                    }
+                                }
+                            }
+
+
+                            if (secondHand.getScore() > 21) {
+                                secondHandWaitsForDealer = false;
+                                secondHandStillPlays = false;
+                            }
+
+                            if (firstHandStillPlays || secondHandStillPlays) {
+                                BlackjackUtil.getInstance().
+                                        calculateDealerProbabilities(dealer.getRevealedCard(), deck.getCardsLeftSimplified());
+                                if (firstHandStillPlays) {
+                                    firstHand.calculateBestMove(deck.getCardsLeftSimplified());
+                                }
+                                if (secondHandStillPlays) {
+                                    secondHand.calculateBestMove(deck.getCardsLeftSimplified());
+                                }
+                                continue;
+                            }
+
+                            if (firstHandWaitsForDealer || secondHandWaitsForDealer) {
+                                deck.revealFaceDownCard(dealer.revealCard());
+
+                                while (dealer.play() != Player.STAND && dealer.score <= 21) {
+                                    dealer.addCard(deck.deal());
+                                }
+
+                                if (firstHandWaitsForDealer) {
+                                    if (firstHand.getScore() > dealer.getScore() || dealer.getScore() > 21) {
+                                        player.winMoney(2 * firstHandBet);
+                                    }
+                                }
+                                if (secondHandWaitsForDealer) {
+                                    if (secondHand.getScore() > dealer.getScore() || dealer.getScore() > 21) {
+                                        player.winMoney(2 * secondHandBet);
+                                    }
+                                }
+                            }
+
+                            playerMakesNextMove = false;
+                            dealerMoves = false;
+
+                            moneyHistogram[i] = player.getMoney();
+                        }
+                    }
+                    case Player.SURRENDER -> {
+                        playerMakesNextMove = false;
+                        player.winMoney(playerBet / 2);
+                        dealerMoves = false;
+                        moneyHistogram[i] = player.getMoney();
+                    }
+                }
+
+
+            } while (playerMakesNextMove);
+
+
+            // If the player is BUST (over 21) the dealer doesn't move
+            if (player.getScore() > 21) {
+                moneyHistogram[i] = player.getMoney();
+                continue;
+            }
+
+            if (!dealerMoves) {
+                continue;
+            }
+
+            deck.revealFaceDownCard(dealer.revealCard());
+            while (dealer.play() != 0 && dealer.getScore() <= 21) {
+                dealer.addCard(deck.deal());
+            }
+
+            // player win condition
+            if (dealer.getScore() > 21 || player.getScore() > dealer.getScore()) {
+                player.winMoney(2 * playerBet);
+            }
+
+            moneyHistogram[i] = player.getMoney();
+        }
+    }
+
+    void startWithPrinting() {
+        Dealer dealer = new Dealer();
+        ComputerPlayer player = new ComputerPlayer(startingMoney);
+        moneyHistogram = new int[handsPlayed];
+
+        Deck deck = new Deck(nOfDecks);
+
+        for (int i = 0; i < handsPlayed; i++) {
+
+            if (player.getMoney() < minBet) {
+                // if players runs out of money the game ends
+                Arrays.fill(moneyHistogram, i, handsPlayed, player.getMoney());
+                break;
+            }
+
             System.out.println("Hand : " + (i + 1) + "\n");
 
             System.out.println("Player : ");
@@ -294,6 +497,6 @@ public class Game {
 
     public static void main(String[] args) {
         Game game = new Game();
-        game.start();
+        game.startWithPrinting();
     }
 }
