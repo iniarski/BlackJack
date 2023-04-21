@@ -8,11 +8,12 @@ public class Game  {
     
 
     // fields for holding game rules
-    protected static  short nOfDecks;
-    protected static  int minBet;
+    protected static short nOfDecks;
+    protected static int minBet;
     protected static int maxBet;
     protected static int startingMoney;
-    protected static  int handsPlayed;
+    protected static int handsPlayed;
+    
     
     public short getnOfDecs()
     {
@@ -57,12 +58,8 @@ public class Game  {
     
 
     Game() 
-    {
-        System.out.print(nOfDecks);
-        System.out.println(minBet);
-        
-
-        
+    {     
+        // Honestly idk what to do with that
     }
 
     // field for storing player's money after each hand played

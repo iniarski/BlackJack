@@ -2,7 +2,10 @@ package iniarski.blackjack;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import org.apache.logging.log4j.*;
 
@@ -27,17 +30,19 @@ public class InputController extends Game {
     private TextField tf5;
 
     static final Logger LOGGER = LogManager.getLogger(InputController.class);
-
-  
-
     
-
     @FXML
     void handle(ActionEvent event) 
     {
 
         try 
         {
+            if(Short.parseShort(tf1.getText()) < 0){tf1.clear();throw new NumberFormatException();}
+            if(Integer.parseInt(tf2.getText()) < 0){tf2.clear();throw new NumberFormatException();}
+            if(Integer.parseInt(tf3.getText()) < 0){tf3.clear();throw new NumberFormatException();}
+            if(Integer.parseInt(tf4.getText()) < 0){tf4.clear();throw new NumberFormatException();}
+            if(Integer.parseInt(tf5.getText()) < 0){tf5.clear();throw new NumberFormatException();}
+            
             LOGGER.info("Button pressed");
             setnOfDecks(Short.parseShort(tf1.getText()));
             
@@ -48,10 +53,13 @@ public class InputController extends Game {
             LOGGER.info("Game Rules set");
             
             Game.main(null);
-        } catch (NumberFormatException e) 
+        } 
+        catch (NumberFormatException e) 
         {
             
-            // TODO: Create an error message.
+            Alert alert = new Alert(AlertType.ERROR, "Please, provide positive integers.", ButtonType.CLOSE);
+            alert.showAndWait();
+
             LOGGER.error("Runtime error, string");
         }
 
