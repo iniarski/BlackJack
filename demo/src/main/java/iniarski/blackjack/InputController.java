@@ -6,7 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import org.apache.logging.log4j.*;
 
-public class InputController {
+public class InputController extends Game {
 
     @FXML
     private Button button;
@@ -28,31 +28,38 @@ public class InputController {
 
     static final Logger LOGGER = LogManager.getLogger(InputController.class);
 
-    private short nOfDecks;
-    private int minBet;
-    private int maxBet;
-    private int startingMoney;
-    private int handsDealt;
+  
+
+    
 
     @FXML
-    void handle(ActionEvent event) {
+    void handle(ActionEvent event) 
+    {
 
-        if (tf1.getText() == null || tf2.getText() == null || tf3.getText() == null || tf4.getText() == null
-                || tf5.getText() == null) {
-            // TODO: Create error message window
+        try 
+        {
+            LOGGER.info("Button pressed");
+            setnOfDecks(Short.parseShort(tf1.getText()));
+            
+            setmaxBet(Integer.parseInt(tf2.getText()));
+            setminBet(Integer.parseInt(tf3.getText()));
+            setstartingMoney(Integer.parseInt(tf4.getText()));
+            sethandsPlayed(Integer.parseInt(tf5.getText()));
+            LOGGER.info("Game Rules set");
+            
+            Game.main(null);
+        } catch (NumberFormatException e) 
+        {
+            
+            // TODO: Create an error message.
+            LOGGER.error("Runtime error, string");
         }
-        LOGGER.info("Button pressed");
-        nOfDecks = Short.parseShort(tf1.getText());
-        LOGGER.info("nOfDecks  = " + nOfDecks);
-        minBet = Integer.parseInt(tf2.getText());
-        LOGGER.info("minBet = " + minBet);
-        maxBet = Integer.parseInt(tf3.getText());
-        LOGGER.info("maxBet = " + maxBet);
-        startingMoney = Integer.parseInt(tf4.getText());
-        LOGGER.info("money = " + startingMoney);
-        handsDealt = Integer.parseInt(tf5.getText());
-        LOGGER.info("Hands = " + handsDealt);
 
     }
 
+   
+
+    
+
+    
 }

@@ -3,18 +3,67 @@ package iniarski.blackjack;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Game {
+public class Game  {
 
-    Game() {
-        // TODO: read rules
-    }
+    
 
     // fields for holding game rules
-    protected short nOfDecks = 4;
-    protected int minBet = 10;
-    protected int maxBet = 50;
-    protected int startingMoney = 250;
-    protected int handsPlayed = 30;
+    protected static  short nOfDecks;
+    protected static  int minBet;
+    protected static int maxBet;
+    protected static int startingMoney;
+    protected static  int handsPlayed;
+    
+    public short getnOfDecs()
+    {
+        return nOfDecks;
+    }
+    public void setnOfDecks(short nOfDecks)
+    {
+        Game.nOfDecks = nOfDecks;
+    }
+    public int getminBet()
+    {
+        return  minBet;
+    }
+    public void setminBet(int minBet)
+    {
+        Game.minBet = minBet;
+    }
+    public int getmaxBet()
+    {
+        return maxBet;
+    }
+    public void setmaxBet(int maxBet)
+    {
+        Game.maxBet = maxBet;
+    }
+    public int getstartingMoney()
+    {
+        return startingMoney;
+    }
+    public void setstartingMoney(int startingMoney)
+    {
+        Game.startingMoney = startingMoney;
+    }
+    public int gethandsPlayed()
+    {
+        return handsPlayed;
+    }
+    public void sethandsPlayed(int handsPlayed)
+    {
+        Game.handsPlayed = handsPlayed;
+    }
+    
+
+    Game() 
+    {
+        System.out.print(nOfDecks);
+        System.out.println(minBet);
+        
+
+        
+    }
 
     // field for storing player's money after each hand played
     protected int[] moneyHistogram;
@@ -496,5 +545,6 @@ public class Game {
     public static void main(String[] args) {
         Game game = new Game();
         game.startWithPrinting();
+        
     }
 }
