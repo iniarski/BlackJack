@@ -4,7 +4,6 @@ package iniarski.blackjack;
 
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class BlackjackUtil {
@@ -15,15 +14,6 @@ public class BlackjackUtil {
     public static final long BYTES_IN_MEGABYTE = 1_048_576;
     private static final BlackjackUtil instance = new BlackjackUtil();
 
-    private final float[] dealerScoreProbabilities = new float[6];
-    // this field stores information of how likely is the dealer to end the game on a score
-    // it is to be interpreted as :
-    // [0] - 17 points
-    // [1] - 18 points
-    // [2] - 19 points
-    // [3] - 20 points
-    // [4] - 21 points
-    // [5] - over 21 points (BUST)
 
     private BlackjackUtil() {
     }
@@ -57,14 +47,27 @@ public class BlackjackUtil {
         return score;
     }
 
-    public float[] getDealerScoreProbabilities() {
+    public float[] getDealerScoreProbabilities(byte dealerCard, short[] cardsInDeck)
+    {
+        final float[] dealerScoreProbabilities = new float[6];
+        // this array stores information of how likely is the dealer to end the game on a score
+        // it is to be interpreted as :
+        // [0] - 17 points
+        // [1] - 18 points
+        // [2] - 19 points
+        // [3] - 20 points
+        // [4] - 21 points
+        // [5] - over 21 points (BUST)
+
+        Arrays.fill(dealerScoreProbabilities, 0.0f);
+
+        calculateDealerProbabilities(dealerCard, cardsInDeck, dealerScoreProbabilities);
+
         return dealerScoreProbabilities;
     }
 
-    public void calculateDealerProbabilities(byte dealerCard, short[] cardsInDeck) {
+    public void calculateDealerProbabilities(byte dealerCard, short[] cardsInDeck, float[] dealerScoreProbabilities) {
 
-        // clearing array
-        Arrays.fill(dealerScoreProbabilities, 0.0f);
 
         // calculating probabilities of cards to come up
         short numberOfCardsLeft = 0;
@@ -113,7 +116,7 @@ public class BlackjackUtil {
                     // executes if dealer hits
                     short[] newDeck = cardsInDeck.clone();
                     newDeck[finalI]--;
-                    calculatePossibleDealerHands(newHand, newDeck, cardProbabilities[finalI]);
+                    calculatePossibleDealerHands(newHand, newDeck, cardProbabilities[finalI], dealerScoreProbabilities);
 
                     latch.countDown();
 
@@ -131,7 +134,8 @@ public class BlackjackUtil {
         }
     }
 
-    private void calculatePossibleDealerHands(byte[] dealerCards, short[] cardsInDeck, float caseProbability) {
+    private void calculatePossibleDealerHands(byte[] dealerCards, short[] cardsInDeck,
+                                              float caseProbability, float[] dealerScoreProbabilities) {
 
         int numberOfCardsLeft = 0;
 
@@ -184,7 +188,7 @@ public class BlackjackUtil {
                 // executes if dealer hits - recursive call
                 short[] newDeck = cardsInDeck.clone();
                 newDeck[finalI]--;
-                calculatePossibleDealerHands(newHand, newDeck, futureCaseProbability);
+                calculatePossibleDealerHands(newHand, newDeck, futureCaseProbability, dealerScoreProbabilities);
 
                 latch.countDown();
             });
@@ -202,9 +206,6 @@ public class BlackjackUtil {
 
     public float calculatePlayerWinningChances(short[] cardsLeft) {
 
-        // !NOTE : this method resets dealerScoreProbabilities
-        // run calculateDealersScoreProbabilities after using this method
-
         // TODO: fix betting
         // idk why but the calculated probability is usually to high and not consistent
         // something to do wit threading, i guess
@@ -219,17 +220,14 @@ public class BlackjackUtil {
 
         float[][] winProbMatrix = new float[10][10];
 
-        float[] cardProbabilities = new float[10];
-
-        for (int i = 0; i < 10; i++) {
-            cardProbabilities[i] = (float) cardsLeft[i] / (float) tempNOfCardsLeft;
-        }
-
+        float[] dealerScoreProbabilities = new float[6];
         Arrays.fill(dealerScoreProbabilities, 0.0f);
 
-        calculatePossibleDealerHands(new byte[]{}, cardsLeft, 1.0f);
+        calculatePossibleDealerHands(new byte[0], cardsLeft, 1.0f, dealerScoreProbabilities);
 
-        CountDownLatch latch = new CountDownLatch(55);
+
+
+        CountDownLatch winProbCalculationLatch = new CountDownLatch(55);
 
         for (byte i = 0; i < 10; i++) {
             for (byte j = i; j < 10; j++) {
@@ -244,13 +242,14 @@ public class BlackjackUtil {
                     }
                     standWinProb += dealerScoreProbabilities[5];
 
-                    float hitWinProb = calculateHitWinProbability(new byte[]{finalI, finalJ}, cardsLeft, nOfCardsLeft, (byte) 1);
+                    float hitWinProb = calculateHitWinProbability(new byte[]{finalI, finalJ}, cardsLeft, nOfCardsLeft,
+                            (byte) 1, dealerScoreProbabilities);
 
 
                     winProbMatrix[finalI][finalJ] = Math.max(standWinProb, hitWinProb);
                     winProbMatrix[finalJ][finalI] = winProbMatrix[finalI][finalJ];
 
-                    latch.countDown();
+                    winProbCalculationLatch.countDown();
                 });
 
                 thread.start();
@@ -275,7 +274,7 @@ public class BlackjackUtil {
         }
 
         try {
-            latch.await();
+            winProbCalculationLatch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -291,7 +290,8 @@ public class BlackjackUtil {
         return playerWinningProb;
     }
 
-    public float calculateHitWinProbability(byte[] cardsInHand, short[] cardsInDeck, short cardsLeft, byte recursionNumber) {
+    public float calculateHitWinProbability(byte[] cardsInHand, short[] cardsInDeck, short cardsLeft,
+                                            byte recursionNumber, float[] dealerScoreProbabilities) {
 
         //calculating probabilities of getting cards
         float[] cardProbabilities = new float[10];
@@ -347,7 +347,8 @@ public class BlackjackUtil {
                     hitMoreWinProbability = standNowWinProbability;
                 } else {
                     hitMoreWinProbability =
-                            calculateHitWinProbability(newHand, newDeck, (short) (cardsLeft - 1), (byte) (recursionNumber + 1));
+                            calculateHitWinProbability(newHand, newDeck, (short) (cardsLeft - 1),
+                                    (byte) (recursionNumber + 1), dealerScoreProbabilities);
                 }
 
 

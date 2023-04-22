@@ -46,14 +46,11 @@ public class Game {
                 continue;
             }
 
-            BlackjackUtil.getInstance().calculateDealerProbabilities(
-                    dealer.getRevealedCard(), deck.getCardsLeftSimplified());
-
             boolean playerMakesNextMove = true;
             boolean dealerMoves = true;
 
             do {
-                player.calculateBestMove(deck.getCardsLeftSimplified());
+                player.calculateBestMove(deck.getCardsLeftSimplified(), dealer.getRevealedCard());
 
                 switch (player.play()) {
                     case Player.STAND -> {
@@ -81,10 +78,9 @@ public class Game {
                         ArrayList<Card> playersHand = player.getHand();
                         firstHand.setHand(playersHand.get(0), deck.deal());
                         secondHand.setHand(playersHand.get(1), deck.deal());
-                        BlackjackUtil.getInstance().
-                                calculateDealerProbabilities(dealer.getRevealedCard(), deck.getCardsLeftSimplified());
-                        firstHand.calculateBestMove(deck.getCardsLeftSimplified());
-                        secondHand.calculateBestMove(deck.getCardsLeftSimplified());
+
+                        firstHand.calculateBestMove(deck.getCardsLeftSimplified(), dealer.getRevealedCard());
+                        secondHand.calculateBestMove(deck.getCardsLeftSimplified(), dealer.getRevealedCard());
                         boolean firstHandStillPlays = true;
                         boolean secondHandStillPlays = true;
                         boolean firstHandWaitsForDealer = true;
@@ -150,13 +146,11 @@ public class Game {
                             }
 
                             if (firstHandStillPlays || secondHandStillPlays) {
-                                BlackjackUtil.getInstance().
-                                        calculateDealerProbabilities(dealer.getRevealedCard(), deck.getCardsLeftSimplified());
                                 if (firstHandStillPlays) {
-                                    firstHand.calculateBestMove(deck.getCardsLeftSimplified());
+                                    firstHand.calculateBestMove(deck.getCardsLeftSimplified(), dealer.getRevealedCard());
                                 }
                                 if (secondHandStillPlays) {
-                                    secondHand.calculateBestMove(deck.getCardsLeftSimplified());
+                                    secondHand.calculateBestMove(deck.getCardsLeftSimplified(), dealer.getRevealedCard());
                                 }
                                 continue;
                             }
@@ -271,16 +265,13 @@ public class Game {
                 continue;
             }
 
-            BlackjackUtil.getInstance().calculateDealerProbabilities(
-                    dealer.getRevealedCard(), deck.getCardsLeftSimplified());
-
             System.out.println("Player move");
 
             boolean playerMakesNextMove = true;
             boolean dealerMoves = true;
 
             do {
-                player.calculateBestMove(deck.getCardsLeftSimplified());
+                player.calculateBestMove(deck.getCardsLeftSimplified(), dealer.getRevealedCard());
 
                 switch (player.play()) {
                     case Player.STAND -> {
@@ -315,10 +306,9 @@ public class Game {
                         firstHand.setHand(playersHand.get(0), deck.deal());
                         secondHand.setHand(playersHand.get(1), deck.deal());
                         System.out.println("Player splits! Player plays with two hand, each with half original bet");
-                        BlackjackUtil.getInstance().
-                                calculateDealerProbabilities(dealer.getRevealedCard(), deck.getCardsLeftSimplified());
-                        firstHand.calculateBestMove(deck.getCardsLeftSimplified());
-                        secondHand.calculateBestMove(deck.getCardsLeftSimplified());
+
+                        firstHand.calculateBestMove(deck.getCardsLeftSimplified(), dealer.getRevealedCard());
+                        secondHand.calculateBestMove(deck.getCardsLeftSimplified(), dealer.getRevealedCard());
                         System.out.println("First hand :");
                         firstHand.printHand();
                         System.out.println("Second hand :");
@@ -406,13 +396,11 @@ public class Game {
                             }
 
                             if (firstHandStillPlays || secondHandStillPlays) {
-                                BlackjackUtil.getInstance().
-                                        calculateDealerProbabilities(dealer.getRevealedCard(), deck.getCardsLeftSimplified());
                                 if (firstHandStillPlays) {
-                                    firstHand.calculateBestMove(deck.getCardsLeftSimplified());
+                                    firstHand.calculateBestMove(deck.getCardsLeftSimplified(), dealer.getRevealedCard());
                                 }
                                 if (secondHandStillPlays) {
-                                    secondHand.calculateBestMove(deck.getCardsLeftSimplified());
+                                    secondHand.calculateBestMove(deck.getCardsLeftSimplified(), dealer.getRevealedCard());
                                 }
                                 continue;
                             }

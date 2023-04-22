@@ -63,7 +63,7 @@ public class ComputerPlayer extends Player{
 
     // this function will save the code of best move to optimalMove field
     // takes the state of the game ( Deck.getCardsLeftSimplified()) and dealer's first card rank as inputs
-    public void calculateBestMove(short[] cardsLeft) {
+    public void calculateBestMove(short[] cardsLeft, byte dealersFaceUpCard) {
 
         // if the score is 21 the only valid move is to stand
         if (score==21) {
@@ -93,7 +93,8 @@ public class ComputerPlayer extends Player{
         // expectedValues array stores expected value of actions
         // were expectedValues[ACTION] - expected value of doing action
         float[] expectedValues = new float[5];
-        float[] dealerProbabilities = BlackjackUtil.getInstance().getDealerScoreProbabilities();
+        float[] dealerProbabilities = BlackjackUtil.getInstance()
+                .getDealerScoreProbabilities(dealersFaceUpCard, cardsLeft);
 
 
         // 0 - STAND
@@ -157,7 +158,8 @@ public class ComputerPlayer extends Player{
 
                     final float thisHitWinProb = cardProbabilities[finalI] *
                             BlackjackUtil.getInstance()
-                                    .calculateHitWinProbability(newHand, newDeck, (short) (finalNOfCardsLeft - 1), (byte) 0);
+                                    .calculateHitWinProbability(newHand, newDeck, (short) (finalNOfCardsLeft - 1),
+                                            (byte) 0, dealerProbabilities);
 
                     hitWinProbability.set(hitWinProbability.get() + thisHitWinProb);
 
@@ -200,7 +202,8 @@ public class ComputerPlayer extends Player{
         if (hand.size() == 2 && hand.get(0).getRank() == hand.get(1).getRank()
         && canSplit) {
             expectedValues[SPLIT] = BlackjackUtil.getInstance().calculateHitWinProbability(
-                    cardsInHand, cardsLeft, nOfCardsLeft, (byte) 0) * 2.0f - 1.0f;
+                    cardsInHand, cardsLeft, nOfCardsLeft,
+                    (byte) 0, dealerProbabilities) * 2.0f - 1.0f;
         } else {
             expectedValues[SPLIT] = NOT_POSSIBLE;
         }
