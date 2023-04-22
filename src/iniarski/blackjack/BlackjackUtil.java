@@ -30,17 +30,19 @@ public class BlackjackUtil {
         // 9 : 10, J, Q and K
 
         byte score = 0;
-        boolean hasAce = false;
+        byte hasAce = 1;
 
         for (byte n : cardRanks) {
-            if (n == 0) {
-                hasAce = true;
-            }
 
             score += n + 1;
+
+            // Since ace is stored as a 0 multiplying all elements of array will produce 0 only when there's an ace
+            hasAce = (byte) (hasAce * n);
         }
 
-        if (hasAce && score <= 11) {
+        // this way there's only one comparison in the function call
+
+        if (hasAce == 11 && score <= 11) {
             score += 10;
         }
 
@@ -162,7 +164,7 @@ public class BlackjackUtil {
                     return;
                 }
 
-                // making new hand (by adding new card of specified index and checking if dealer still has play
+                // making new hand (by adding new card of specified index and checking if dealer still has play)
                 byte[] newHand = Arrays.copyOf(dealerCards, dealerCards.length + 1);
                 newHand[newHand.length - 1] = finalI;
                 int tempScore = calculateScore(newHand);
