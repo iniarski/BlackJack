@@ -42,6 +42,16 @@ public class Game {
 
             if (dealer.has21()) {
                 deck.revealFaceDownCard(dealer.revealCard());
+                if (player.getScore() == 21) {
+                    player.winMoney(playerBet);
+                }
+                moneyHistogram[i] = player.getMoney();
+                continue;
+            }
+
+            if (player.getScore() == 21) {
+                player.winMoney((int ) (2.5 * playerBet));
+
                 moneyHistogram[i] = player.getMoney();
                 continue;
             }
@@ -261,6 +271,14 @@ public class Game {
                 }
                 System.out.println("Dealer has 21 points and wins the hand");
                 dealer.printHand();
+                moneyHistogram[i] = player.getMoney();
+                continue;
+            }
+
+            if (player.getScore() == 21) {
+                player.winMoney((int) (2.5 * playerBet));
+                System.out.println("BLACKJACK!!!");
+                System.out.println("Player wins 1.5x bet");
                 moneyHistogram[i] = player.getMoney();
                 continue;
             }
