@@ -3,7 +3,7 @@ package iniarski.blackjack;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Game {
+public class Game implements Runnable{
 
     Game() {
         // TODO: read rules
@@ -19,7 +19,12 @@ public class Game {
     // field for storing player's money after each hand played
     protected int[] moneyHistogram;
 
-    void start() {
+    @Override
+    public void run() {
+        playGame();
+    }
+
+    void playGame() {
         Dealer dealer = new Dealer();
         ComputerPlayer player = new ComputerPlayer(startingMoney);
         moneyHistogram = new int[handsPlayed];
@@ -232,7 +237,7 @@ public class Game {
         }
     }
 
-    void startWithPrinting() {
+    void playGameWithPrinting() {
         Dealer dealer = new Dealer();
         ComputerPlayer player = new ComputerPlayer(startingMoney);
         moneyHistogram = new int[handsPlayed];
@@ -523,6 +528,6 @@ public class Game {
 
     public static void main(String[] args) {
         Game game = new Game();
-        game.startWithPrinting();
+        game.playGameWithPrinting();
     }
 }
