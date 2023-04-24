@@ -7,14 +7,20 @@ public class Game implements Runnable{
 
     Game() {
         // TODO: read rules
+
+        nOfDecks = 4;
+        minBet = 10;
+        maxBet = 100;
+        startingMoney = 1000;
+        handsPlayed = 30;
     }
 
     // fields for holding game rules
-    protected short nOfDecks = 4;
-    protected int minBet = 10;
-    protected int maxBet = 50;
-    protected int startingMoney = 250;
-    protected int handsPlayed = 30;
+    protected short nOfDecks;
+    protected int minBet;
+    protected int maxBet;
+    protected int startingMoney ;
+    protected int handsPlayed;
 
     // field for storing player's money after each hand played
     protected int[] moneyHistogram;
