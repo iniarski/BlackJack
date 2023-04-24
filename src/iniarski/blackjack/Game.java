@@ -245,7 +245,7 @@ public class Game implements Runnable{
             moneyHistogram[i] = player.getMoney();
         }
 
-        System.out.println("Game " + id + " finished, result: " + player.getScore());
+        System.out.println("Game " + id + " finished, result: " + player.getMoney());
     }
 
     void playGameWithPrinting() {
