@@ -29,6 +29,9 @@ public class InputController extends Game {
     @FXML
     private TextField tf5;
 
+    @FXML
+    private TextField tf6;
+
     static final Logger LOGGER = LogManager.getLogger(InputController.class);
     
     @FXML
