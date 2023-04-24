@@ -194,7 +194,7 @@ public class BlackjackUtil {
 
                 latch.countDown();
             },
-                    this.toString(), 4 * BYTES_IN_MEGABYTE);
+                    this.toString(), 6 * BYTES_IN_MEGABYTE);
 
             thread.start();
         }
@@ -226,7 +226,12 @@ public class BlackjackUtil {
         float[] dealerScoreProbabilities = new float[6];
         Arrays.fill(dealerScoreProbabilities, 0.0f);
 
-        calculatePossibleDealerHands(new byte[0], cardsLeft, 1.0f, dealerScoreProbabilities);
+        // reducing the initial probability to make threads end faster
+        calculatePossibleDealerHands(new byte[0], cardsLeft, 0.1f, dealerScoreProbabilities);
+        // results will be 10 smaller, it's necessary to adjust
+        for (int i = 0; i < 6; i++) {
+            dealerScoreProbabilities[i] *= 10.0f;
+        }
 
 
 

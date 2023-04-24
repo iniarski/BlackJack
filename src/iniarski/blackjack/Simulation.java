@@ -3,16 +3,19 @@ package iniarski.blackjack;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Simulation
 {
     protected int nOfSimulations;
     protected int handsPlayed;
+    protected int maxConcurrentGames;
 
     public Simulation()
     {
-        nOfSimulations = 2;
-        handsPlayed = 40;
+        nOfSimulations = 20;
+        handsPlayed = 30;
+        maxConcurrentGames = 4;
     }
 
     protected int[][] moneyMatrix;
@@ -20,27 +23,21 @@ public class Simulation
     public void simulate()
     {
         Game[] games = new Game[nOfSimulations];
-        Thread[] gameThreads = new Thread[nOfSimulations];
+        ExecutorService gamePool = Executors.newFixedThreadPool(maxConcurrentGames);
 
         for (int i = 0; i < nOfSimulations; i++)
         {
-            games[i] = new Game();
-            gameThreads[i] = new Thread(games[i]);
-            gameThreads[i].start();
+            games[i] = new Game(i);
+            gamePool.submit(games[i]);
         }
 
-        moneyMatrix = new int[nOfSimulations][handsPlayed];
+        gamePool.shutdown();
 
-        for (int i = 0; i < nOfSimulations; i++) {
-            try {
-                gameThreads[i].join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            moneyMatrix[i] = games[i].getMoneyHistogram();
+        try {
+            gamePool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-
 
 
         for (int i = 0; i < nOfSimulations; i++)
