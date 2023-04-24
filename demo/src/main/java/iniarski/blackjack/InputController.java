@@ -46,8 +46,8 @@ public class InputController extends Game {
             LOGGER.info("Button pressed");
             setnOfDecks(Short.parseShort(tf1.getText()));
             
-            setmaxBet(Integer.parseInt(tf2.getText()));
-            setminBet(Integer.parseInt(tf3.getText()));
+            setmaxBet(Integer.parseInt(tf3.getText()));
+            setminBet(Integer.parseInt(tf2.getText()));
             setstartingMoney(Integer.parseInt(tf4.getText()));
             sethandsPlayed(Integer.parseInt(tf5.getText()));
             LOGGER.info("Game Rules set");
