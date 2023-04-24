@@ -156,7 +156,7 @@ public class BlackjackUtil {
 
         for (byte i = 0; i < 10; i++) {
             byte finalI = i;
-            Thread thread = new Thread(() -> {
+            Thread thread = new Thread(null ,() -> {
 
                 // checking for edge case - if there are no cards of such rank left in deck
                 if (cardsInDeck[finalI] == 0) {
@@ -193,7 +193,8 @@ public class BlackjackUtil {
                 calculatePossibleDealerHands(newHand, newDeck, futureCaseProbability, dealerScoreProbabilities);
 
                 latch.countDown();
-            });
+            },
+                    this.toString(), 4 * BYTES_IN_MEGABYTE);
 
             thread.start();
         }
