@@ -43,7 +43,12 @@ public class ComputerPlayer extends Player{
     //
     public int bet(int minBet, int maxBet, short[] cardsLeft) {
 
-        float winProb = BlackjackUtil.getInstance().calculatePlayerWinningChances(cardsLeft);
+        //float winProb = BlackjackUtil.getInstance().calculatePlayerWinningChances(cardsLeft);
+
+        // Temporary fix, remove when calculatePlayerWinningChances will be working properly
+
+        float winProb = BlackjackUtil.getInstance().omega2WinningChances(cardsLeft);
+
 
         // optimal bet fraction derived from Kelly's criterion
         float betFraction = 2.0f * winProb - 1.0f;
@@ -63,7 +68,7 @@ public class ComputerPlayer extends Player{
 
     // this function will save the code of best move to optimalMove field
     // takes the state of the game ( Deck.getCardsLeftSimplified()) and dealer's first card rank as inputs
-    public void calculateBestMove(short[] cardsLeft) {
+    public void calculateBestMove(short[] cardsLeft, byte dealersFaceUpCard) {
 
         // if the score is 21 the only valid move is to stand
         if (score==21) {
@@ -93,7 +98,8 @@ public class ComputerPlayer extends Player{
         // expectedValues array stores expected value of actions
         // were expectedValues[ACTION] - expected value of doing action
         float[] expectedValues = new float[5];
-        float[] dealerProbabilities = BlackjackUtil.getInstance().getDealerScoreProbabilities();
+        float[] dealerProbabilities = BlackjackUtil.getInstance()
+                .getDealerScoreProbabilities(dealersFaceUpCard, cardsLeft);
 
 
         // 0 - STAND
@@ -105,10 +111,12 @@ public class ComputerPlayer extends Player{
         // adding probability that dealer is bust
         standWinProbability += dealerProbabilities[5];
 
+        float standPushProbability = score >= 17 ? dealerProbabilities[score - 17] : 0.0f;
+
         // expected value of standing : ev = 1 * p - 1 * (1 - p) = 2p - 1
         // where p - probability of winning if standing
 
-        expectedValues[STAND] = 2.0f * standWinProbability - 1.0f;
+        expectedValues[STAND] = 2.0f * standWinProbability - 1.0f + standPushProbability;
 
         // 1 - HIT
 
@@ -155,7 +163,8 @@ public class ComputerPlayer extends Player{
 
                     final float thisHitWinProb = cardProbabilities[finalI] *
                             BlackjackUtil.getInstance()
-                                    .calculateHitWinProbability(newHand, newDeck, (short) (finalNOfCardsLeft - 1), (byte) 0);
+                                    .calculateHitWinProbability(newHand, newDeck, (short) (finalNOfCardsLeft - 1),
+                                            (byte) 0, dealerProbabilities);
 
                     hitWinProbability.set(hitWinProbability.get() + thisHitWinProb);
 
@@ -198,7 +207,8 @@ public class ComputerPlayer extends Player{
         if (hand.size() == 2 && hand.get(0).getRank() == hand.get(1).getRank()
         && canSplit) {
             expectedValues[SPLIT] = BlackjackUtil.getInstance().calculateHitWinProbability(
-                    cardsInHand, cardsLeft, nOfCardsLeft, (byte) 0) * 2.0f - 1.0f;
+                    cardsInHand, cardsLeft, nOfCardsLeft,
+                    (byte) 0, dealerProbabilities) * 2.0f - 1.0f;
         } else {
             expectedValues[SPLIT] = NOT_POSSIBLE;
         }
