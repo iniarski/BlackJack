@@ -96,7 +96,7 @@ public class Deck {
 
         // 10, J, Q and K are added together because they are each worth 10 points
         // and are identical in terms of rules of the game
-        for (int i = 9; i < 12; i++) {
+        for (int i = 9; i < 13; i++) {
             cardsSimplified[9] += nOfCardsLeft[i];
         }
 

@@ -13,7 +13,7 @@ public class Simulation
 
     public Simulation()
     {
-        nOfSimulations = 20;
+        nOfSimulations = 5;
         handsPlayed = 40;
         maxConcurrentGames = 8;
     }
