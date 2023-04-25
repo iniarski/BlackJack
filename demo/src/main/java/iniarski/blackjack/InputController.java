@@ -7,7 +7,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
-import org.apache.logging.log4j.*;
 
 public class InputController extends Game {
 
@@ -32,7 +31,7 @@ public class InputController extends Game {
     @FXML
     private TextField tf6;
 
-    static final Logger LOGGER = LogManager.getLogger(InputController.class);
+    
     
     @FXML
     void handle(ActionEvent event) 
@@ -46,14 +45,14 @@ public class InputController extends Game {
             if(Integer.parseInt(tf4.getText()) < 0){tf4.clear();throw new NumberFormatException();}
             if(Integer.parseInt(tf5.getText()) < 0){tf5.clear();throw new NumberFormatException();}
             
-            LOGGER.info("Button pressed");
+            
             setnOfDecks(Short.parseShort(tf1.getText()));
             
             setmaxBet(Integer.parseInt(tf3.getText()));
             setminBet(Integer.parseInt(tf2.getText()));
             setstartingMoney(Integer.parseInt(tf4.getText()));
             sethandsPlayed(Integer.parseInt(tf5.getText()));
-            LOGGER.info("Game Rules set");
+            
             
             Game.main(null);
         } 
@@ -63,7 +62,7 @@ public class InputController extends Game {
             Alert alert = new Alert(AlertType.ERROR, "Please, provide positive integers.", ButtonType.CLOSE);
             alert.showAndWait();
 
-            LOGGER.error("Runtime error, string");
+            
         }
 
     }
