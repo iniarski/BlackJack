@@ -13,13 +13,14 @@ public class Game  {
     protected  int maxBet;
     protected  int startingMoney;
     protected  int handsPlayed;
+    protected  int id;
     
     
    
 
     Game(int id) 
     {    
-        
+        this.id = id;
         
     }
 
