@@ -40,7 +40,7 @@ public class InputController {
     private int money;
     private int hands;
     private int noOfSims;
-    private int games = 5;
+    //private int games = 5;
 
     
     public InputController() 
@@ -119,7 +119,7 @@ public class InputController {
             Simulation sim = new Simulation();
             sim.handsPlayed = getHandsPlayed();
             sim.nOfSimulations = getNoOfSims();
-            sim.maxConcurrentGames = 5;
+            //sim.maxConcurrentGames = 5;
             sim.simulate();
         }
         catch(NumberFormatException e)
@@ -180,13 +180,13 @@ public class InputController {
         this.noOfSims = noOfSims;
     }
 
-    public int getGames() {
+    /*public int getGames() {
         return games;
     }
 
     public void setGames(int games) {
         this.games = games;
-    }
+    }*/
 
    
 
