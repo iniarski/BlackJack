@@ -87,7 +87,7 @@ public class InputController {
             game.minBet = getMinBet();
             game.startingMoney = getStartingMoney();
             game.handsPlayed = getStartingMoney();
-            game.startWithPrinting();
+            game.playGameWithPrinting();
 
             
             

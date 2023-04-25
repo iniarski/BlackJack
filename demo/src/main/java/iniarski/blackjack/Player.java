@@ -1,7 +1,6 @@
 package iniarski.blackjack;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 // defining abstract class Player form which
 // Dealer, ComputerPlayer and (possibly) HumanPlayer will inherit
