@@ -14,8 +14,8 @@ public class Simulation
     public Simulation()
     {
         nOfSimulations = 20;
-        handsPlayed = 30;
-        maxConcurrentGames = 4;
+        handsPlayed = 40;
+        maxConcurrentGames = 8;
     }
 
     protected int[][] moneyMatrix;
@@ -39,13 +39,17 @@ public class Simulation
             e.printStackTrace();
         }
 
-
+        float average = 0;
         for (int i = 0; i < nOfSimulations; i++)
         {
             System.out.println(Arrays.toString(games[i].getMoneyHistogram()));
+            average += games[i].getMoneyHistogram()[handsPlayed-1];
         }
 
-        System.out.println(Arrays.toString(moneyMatrix));
+        average /= nOfSimulations;
+
+        System.out.println("Average result " + average);
+
     }
 
     public static void main(String[] args)

@@ -12,7 +12,7 @@ public class Game implements Runnable{
         minBet = 10;
         maxBet = 100;
         startingMoney = 1000;
-        handsPlayed = 30;
+        handsPlayed = 40;
         this.id = id;
     }
 
