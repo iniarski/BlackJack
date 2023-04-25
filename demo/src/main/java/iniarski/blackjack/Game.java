@@ -8,58 +8,19 @@ public class Game  {
     
 
     // fields for holding game rules
-    protected static short nOfDecks;
-    protected static int minBet;
-    protected static int maxBet;
-    protected static int startingMoney;
-    protected static int handsPlayed;
+    protected  short nOfDecks;
+    protected  int minBet;
+    protected  int maxBet;
+    protected  int startingMoney;
+    protected  int handsPlayed;
     
     
-    public short getnOfDecs()
-    {
-        return nOfDecks;
-    }
-    public void setnOfDecks(short nOfDecks)
-    {
-        Game.nOfDecks = nOfDecks;
-    }
-    public int getminBet()
-    {
-        return  minBet;
-    }
-    public void setminBet(int minBet)
-    {
-        Game.minBet = minBet;
-    }
-    public int getmaxBet()
-    {
-        return maxBet;
-    }
-    public void setmaxBet(int maxBet)
-    {
-        Game.maxBet = maxBet;
-    }
-    public int getstartingMoney()
-    {
-        return startingMoney;
-    }
-    public void setstartingMoney(int startingMoney)
-    {
-        Game.startingMoney = startingMoney;
-    }
-    public int gethandsPlayed()
-    {
-        return handsPlayed;
-    }
-    public void sethandsPlayed(int handsPlayed)
-    {
-        Game.handsPlayed = handsPlayed;
-    }
-    
+   
 
-    Game() 
-    {     
-        // Honestly idk what to do with that
+    Game(int id) 
+    {    
+        
+        
     }
 
     // field for storing player's money after each hand played
@@ -540,8 +501,9 @@ public class Game  {
     }
 
     public static void main(String[] args) {
-        Game game = new Game();
+        Game game = new Game(0);
         game.startWithPrinting();
+        
         
     }
 }
