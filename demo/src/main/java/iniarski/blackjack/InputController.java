@@ -39,6 +39,8 @@ public class InputController {
     private int max;
     private int money;
     private int hands;
+    private int noOfSims;
+    private int games = 5;
 
     
     public InputController() 
@@ -76,9 +78,9 @@ public class InputController {
             setMaxBet(Integer.parseInt(tf3.getText()));
             setStartingMoney(Integer.parseInt(tf4.getText()));
             setHandsPlayed(Integer.parseInt(tf5.getText()));
-            System.out.println (Decks);
-            System.out.println (min);
-            System.out.println (max);
+            //System.out.println (Decks);
+            //System.out.println (min);
+            //System.out.println (max);
             Game game = new Game(0);
             game.nOfDecks = getnOfDecks();
             game.maxBet = getMaxBet();
@@ -108,7 +110,25 @@ public class InputController {
     @FXML
     void handle2(ActionEvent event) 
     {
-        Game.main(null);
+        try
+        {
+            if(Integer.parseInt(tf6.getText())<0){tf6.clear(); throw new NumberFormatException();}
+            if(Integer.parseInt(tf5.getText()) < 0){tf5.clear();throw new NumberFormatException();}
+            setNoOfSims(Integer.parseInt(tf6.getText()));
+            setHandsPlayed(Integer.parseInt(tf5.getText()));
+            Simulation sim = new Simulation();
+            sim.handsPlayed = getHandsPlayed();
+            sim.nOfSimulations = getNoOfSims();
+            sim.maxConcurrentGames = 5;
+            sim.simulate();
+        }
+        catch(NumberFormatException e)
+        {
+            Alert alert = new Alert(AlertType.ERROR, "Please, provide positive integers.", ButtonType.CLOSE);
+            alert.showAndWait();
+
+
+        }
 
     }
 
@@ -150,6 +170,22 @@ public class InputController {
 
     public void setHandsPlayed(int hands) {
         this.hands = hands;
+    }
+
+    public int getNoOfSims() {
+        return noOfSims;
+    }
+
+    public void setNoOfSims(int noOfSims) {
+        this.noOfSims = noOfSims;
+    }
+
+    public int getGames() {
+        return games;
+    }
+
+    public void setGames(int games) {
+        this.games = games;
     }
 
    
