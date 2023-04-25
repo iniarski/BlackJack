@@ -247,7 +247,6 @@ public class BlackjackUtil {
 
                     final float finalStandWinProb = standWinProb;
 
-                    Thread thread = new Thread(() -> {
                         float hitWinProb = calculateHitWinProbability(new byte[]{finalI, finalJ}, newDeck,
                                 (short) (nOfCardsLeft - 2), (byte) 1, dealerScoreProbabilities);
 
@@ -256,9 +255,6 @@ public class BlackjackUtil {
                         winProbMatrix[finalJ][finalI] = winProbMatrix[finalI][finalJ];
 
                         winProbCalculationLatch.countDown();
-                    });
-
-                       thread.start();
             }
         }
 

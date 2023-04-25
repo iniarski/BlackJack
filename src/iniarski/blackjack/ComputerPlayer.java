@@ -43,11 +43,11 @@ public class ComputerPlayer extends Player{
     //
     public int bet(int minBet, int maxBet, short[] cardsLeft) {
 
-        //float winProb = BlackjackUtil.getInstance().calculatePlayerWinningChances(cardsLeft);
+        float winProb = BlackjackUtil.getInstance().calculatePlayerWinningChances(cardsLeft);
 
         // Temporary fix, remove when calculatePlayerWinningChances will be working properly
 
-        float winProb = BlackjackUtil.getInstance().omega2WinningChances(cardsLeft);
+        //float winProb = BlackjackUtil.getInstance().omega2WinningChances(cardsLeft);
 
 
         // optimal bet fraction derived from Kelly's criterion
