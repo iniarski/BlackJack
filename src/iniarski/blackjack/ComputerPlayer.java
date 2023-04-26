@@ -47,7 +47,7 @@ public class ComputerPlayer extends Player{
 
         // Temporary fix, remove when calculatePlayerWinningChances will be working properly
 
-        float winProb = BlackjackUtil.getInstance().omega2WinningChances(cardsLeft);
+        float winProb = BlackjackUtil.getInstance().wongHalvesWinningChances(cardsLeft);
 
 
         // optimal bet fraction derived from Kelly's criterion
@@ -71,7 +71,7 @@ public class ComputerPlayer extends Player{
     public void calculateBestMove(short[] cardsLeft, byte dealersFaceUpCard) {
 
         // if the score is 21 the only valid move is to stand
-        if (score==21) {
+        if (score >= 19) {
             optimalMove = STAND;
             return;
         }

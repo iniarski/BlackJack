@@ -14,8 +14,8 @@ public class Simulation
     public Simulation()
     {
         nOfSimulations = 20;
-        handsPlayed = 40;
-        maxConcurrentGames = 8;
+        handsPlayed = 60;
+        maxConcurrentGames = 10;
     }
 
     protected int[][] moneyMatrix;

@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class BlackjackUtil {
 
     // NEGLIGIBLE_THRESHOLD determines when probability is so small that case can be not considered
-    public static final float NEGLIGIBLE_THRESHOLD = 0.0005f;
+    public static final float NEGLIGIBLE_THRESHOLD = 0.0001f;
     public static final byte MAX_RECURSIONS = 3;
     private static final BlackjackUtil instance = new BlackjackUtil();
 
@@ -296,12 +296,12 @@ public class BlackjackUtil {
         return playerWinningProb;
     }
 
-    public float omega2WinningChances(short[] cardsLeft){
+    public float wongHalvesWinningChances(short[] cardsLeft){
         int nOfCardsLeft = 0;
 
 
         int runningCount = 0;
-        int[] omegaValues = {0, 1, 1, 2, 2, 2, 1, 0, -1, -2};
+        int[] wongHalvesValues = {-2, 1, 2, 2, 3, 2, 1, 0, -1, -2};
 
         for (int i = 0; i < 10; i++) {
             nOfCardsLeft += cardsLeft[i];
@@ -309,15 +309,16 @@ public class BlackjackUtil {
             // calculating running count
             // number of cards of a rank left * value in omega 2 system
             // negative because we are counting cards left in the deck, not cards dealt
-            runningCount -= omegaValues[i] * cardsLeft[i];
+            runningCount -= wongHalvesValues[i] * cardsLeft[i];
         }
 
         float decksLeft = nOfCardsLeft / 52f;
 
 
-        float trueCount = runningCount/decksLeft;
+        float trueCount = runningCount/decksLeft/2f;
 
-        float playersEdge = (trueCount - 1f) / 2f;
+        float playersEdge = (trueCount - 2f) / 2f;
+
 
         float winningChances = (50f + playersEdge) / 100f;
 
