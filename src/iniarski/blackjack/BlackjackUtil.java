@@ -12,9 +12,26 @@ public class BlackjackUtil {
     public static final float NEGLIGIBLE_THRESHOLD = 0.0005f;
     public static final byte MAX_RECURSIONS = 3;
     private static final BlackjackUtil instance = new BlackjackUtil();
+    private final byte[][] scoreMatrix = new byte[10][10];
 
 
     private BlackjackUtil() {
+        // populating scoreMatrix with score representing hand composed of 2 cards represented by the indexes
+
+        for (int i = 0; i < 10; i++) {
+            // soft totals (with ace)
+
+            scoreMatrix[0][i] = (byte) (i + 12);
+            scoreMatrix[i][0] = scoreMatrix[0][i];
+        }
+
+        // hard totals
+        for (int i = 1; i < 10; i++) {
+            for (int j = 1; j < 10; j++) {
+                scoreMatrix[i][j] = (byte) (i + j + 2);
+            }
+        }
+
     }
 
     public static BlackjackUtil getInstance() {
@@ -226,37 +243,56 @@ public class BlackjackUtil {
 
         calculatePossibleDealerHands(new byte[0], cardsLeft, 1f, dealerScoreProbabilities);
 
+        Thread softTotalsThread = new Thread(() -> {
+            for (byte i = 0; i < 10; i++) {
+                byte[] newHand = {0, i};
 
-        CountDownLatch winProbCalculationLatch = new CountDownLatch(55);
+                short[] newDeck = cardsLeft.clone();
+                newDeck[0]--;
+                newDeck[i]--;
 
-        for (byte i = 0; i < 10; i++) {
-            for (byte j = i; j < 10; j++) {
-                byte finalI = i; byte finalJ = j;
-                    float standWinProb = 0.0f;
-
-                    byte tempScore = calculateScore(new byte[]{finalI, finalJ});
-
-                    for (byte k = 0; k < tempScore - 17; k++) {
-                        standWinProb += dealerScoreProbabilities[k];
-                    }
-                    standWinProb += dealerScoreProbabilities[5];
-
-                    short[] newDeck = cardsLeft.clone();
-                    newDeck[finalI]--;
-                    newDeck[finalJ]--;
-
-                    final float finalStandWinProb = standWinProb;
-
-                        float hitWinProb = calculateHitWinProbability(new byte[]{finalI, finalJ}, newDeck,
-                                (short) (nOfCardsLeft - 2), (byte) 1, dealerScoreProbabilities);
-
-
-                        winProbMatrix[finalI][finalJ] = Math.max(finalStandWinProb, hitWinProb);
-                        winProbMatrix[finalJ][finalI] = winProbMatrix[finalI][finalJ];
-
-                        winProbCalculationLatch.countDown();
+                winProbMatrix[0][i] = calculateHitWinProbability(newHand, cardsLeft, (short) (nOfCardsLeft - 2),
+                        (byte) 0, dealerScoreProbabilities);
+                winProbMatrix[i][0] = winProbMatrix[0][i];
             }
-        }
+        });
+
+        softTotalsThread.start();
+
+        Thread hardTotalsThread = new Thread(() -> {
+            // iterating over possible hard totals
+            for (byte i = 4; i < 21; i++) {
+                float scoreWinningProbability = 0f;
+                boolean scoreIndexNotFound = true;
+
+                for (byte j = 1; j < 10; j++) {
+                    for (byte k = 1; k < 10; k++) {
+                        if (scoreMatrix[j][k] == i) {
+                            if (scoreIndexNotFound) {
+                                byte[] newHand = {j, k};
+                                short[] newDeck = cardsLeft.clone();
+
+                                newDeck[j]--;
+                                newDeck[k]--;
+
+                                scoreWinningProbability = calculateHitWinProbability(newHand, newDeck,
+                                        (short) (nOfCardsLeft - 2), (byte) 0, dealerScoreProbabilities);
+
+                                winProbMatrix[j][k] = scoreWinningProbability;
+                                scoreIndexNotFound = false;
+                            } else {
+                                winProbMatrix[j][k] = scoreWinningProbability;
+                            }
+                        }
+                    }
+                }
+
+            }
+        });
+
+        hardTotalsThread.start();
+
+
 
         float[][] CardProbMatrix = new float[10][10];
         for (byte i = 0; i < 10; i++) {
@@ -276,7 +312,8 @@ public class BlackjackUtil {
         }
 
         try {
-            winProbCalculationLatch.await();
+            softTotalsThread.join();
+            hardTotalsThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -288,6 +325,8 @@ public class BlackjackUtil {
                 playerWinningProb += CardProbMatrix[i][j] * winProbMatrix[i][j];
             }
         }
+
+        System.out.println(playerWinningProb);
 
         return playerWinningProb;
     }
@@ -336,7 +375,7 @@ public class BlackjackUtil {
         for (byte i = 0; i < 10; i++) {
 
                 // end if no cards of rank left
-                if (cardsInDeck[i] == 0){
+                if (cardsInDeck[i] <= 0){
                     latch.countDown();
                     continue;
                 }
