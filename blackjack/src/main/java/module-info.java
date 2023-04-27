@@ -3,6 +3,6 @@ module iniarski.blackjack {
     requires javafx.fxml;
             
                             
-    opens iniarski.blackjack to javafx.fxml, javafx.controls;
+    opens iniarski.blackjack to javafx.fxml;
     exports iniarski.blackjack;
 }

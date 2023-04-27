@@ -17,6 +17,9 @@ public class InputController {
     private Button playButton;
 
     @FXML
+    private Button simButton;
+
+    @FXML
     private TextField tf1;
 
     @FXML
@@ -43,12 +46,6 @@ public class InputController {
     //private int games = 5;
 
     
-    public InputController() 
-    {
-
-        
-        
-    }
 
 
 
@@ -58,13 +55,19 @@ public class InputController {
     @FXML
     void handle(ActionEvent event) 
     {
-
-        try 
+        try
         {
+
+            this.Decks = (Short.parseShort(tf1.getText()));
+            this.min = (Integer.parseInt(tf2.getText()));
+            this.max = (Integer.parseInt(tf3.getText()));
+            this.money = (Integer.parseInt(tf4.getText()));
+            this.hands = (Integer.parseInt(tf5.getText()));
+            this.noOfSims = (Integer.parseInt(tf6.getText()));
             if(Short.parseShort(tf1.getText()) < 0){tf1.clear();throw new NumberFormatException();}
             if(Short.parseShort(tf1.getText()) > 8)
             {
-                tf1.clear(); 
+                tf1.clear();
                 Alert alert = new Alert(AlertType.ERROR, "Please provide up to 8 decks", ButtonType.CLOSE);
                 alert.showAndWait();
 
@@ -73,37 +76,25 @@ public class InputController {
             if(Integer.parseInt(tf3.getText()) < 0){tf3.clear();throw new NumberFormatException();}
             if(Integer.parseInt(tf4.getText()) < 0){tf4.clear();throw new NumberFormatException();}
             if(Integer.parseInt(tf5.getText()) < 0){tf5.clear();throw new NumberFormatException();}
-            setnOfDecks(Short.parseShort(tf1.getText()));
-            setMinBet(Integer.parseInt(tf2.getText()));
-            setMaxBet(Integer.parseInt(tf3.getText()));
-            setStartingMoney(Integer.parseInt(tf4.getText()));
-            setHandsPlayed(Integer.parseInt(tf5.getText()));
+
+
+
+
+
             //System.out.println (Decks);
             //System.out.println (min);
             //System.out.println (max);
-            Game game = new Game(0);
-            game.nOfDecks = getnOfDecks();
-            game.maxBet = getMaxBet();
-            game.minBet = getMinBet();
-            game.startingMoney = getStartingMoney();
-            game.handsPlayed = getStartingMoney();
-            game.playGameWithPrinting();
-
-            
-            
-            
-            
-            
-            
-        } 
-        catch (NumberFormatException e) 
+        }
+        catch (NumberFormatException e)
         {
-            
+
             Alert alert = new Alert(AlertType.ERROR, "Please, provide positive integers.", ButtonType.CLOSE);
             alert.showAndWait();
 
-            
+
         }
+
+
 
     }
 
@@ -112,15 +103,18 @@ public class InputController {
     {
         try
         {
-            if(Integer.parseInt(tf6.getText())<0){tf6.clear(); throw new NumberFormatException();}
-            if(Integer.parseInt(tf5.getText()) < 0){tf5.clear();throw new NumberFormatException();}
-            setNoOfSims(Integer.parseInt(tf6.getText()));
-            setHandsPlayed(Integer.parseInt(tf5.getText()));
+            //if(Integer.parseInt(tf6.getText())<0){tf6.clear(); throw new NumberFormatException();}
+            //if(Integer.parseInt(tf5.getText()) < 0){tf5.clear();throw new NumberFormatException();}
+            //setNoOfSims(Integer.parseInt(tf6.getText()));
+            //setHandsPlayed(Integer.parseInt(tf5.getText()));
             Simulation sim = new Simulation();
-            sim.handsPlayed = getHandsPlayed();
-            sim.nOfSimulations = getNoOfSims();
+            sim.nOfSimulations = noOfSims;
+            //sim.nOfSimulations = getNoOfSims();
+            //sim.handsPlayed = getHandsPlayed();
+            //sim.handsPlayed = getHandsPlayed();
+            //sim.nOfSimulations = getNoOfSims();
             //sim.maxConcurrentGames = 5;
-            sim.simulate();
+            sim.simulate(Decks,min,max,money,hands);
         }
         catch(NumberFormatException e)
         {
@@ -132,9 +126,19 @@ public class InputController {
 
     }
 
-    public short getnOfDecks() {
-        return Decks;
+    @FXML
+    void handle3(ActionEvent event)
+    {
+        Game game = new Game(0,Decks,min,max,money,hands);
+//
+        game.playGameWithPrinting();
+
+
+
+
     }
+
+    public short getnOfDecks() {   return Decks;  }
 
     public void setnOfDecks(short Decks) {
         this.Decks = Decks;
@@ -172,7 +176,7 @@ public class InputController {
         this.hands = hands;
     }
 
-    public int getNoOfSims() {
+    public  int getNoOfSims() {
         return noOfSims;
     }
 

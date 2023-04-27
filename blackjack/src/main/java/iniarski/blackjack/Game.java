@@ -5,14 +5,16 @@ import java.util.Arrays;
 
 public class Game implements Runnable{
 
-    Game(int id) {
+
+
+    Game(int id, short Decks, int min, int max, int money, int hands) {
         // TODO: read rules
 
-        nOfDecks = 4;
-        minBet = 10;
-        maxBet = 100;
-        startingMoney = 1000;
-        handsPlayed = 40;
+        this.nOfDecks = Decks;
+        this.minBet = min;
+        this.maxBet = max;
+        this.startingMoney = money;
+        this.handsPlayed = hands;
         this.id = id;
     }
 
@@ -26,6 +28,11 @@ public class Game implements Runnable{
     // field for storing player's money after each hand played
     protected int[] moneyHistogram;
     protected int id;
+
+    public int getId()
+    {
+        return this.id;
+    }
 
     @Override
     public void run() {
@@ -537,8 +544,5 @@ public class Game implements Runnable{
         return moneyHistogram;
     }
 
-    public static void main(String[] args) {
-        Game game = new Game(0);
-        game.playGameWithPrinting();
-    }
+
 }

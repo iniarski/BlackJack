@@ -12,14 +12,15 @@
       <TextField fx:id="tf3" layoutX="45.0" layoutY="125.0" text="100" />
       <TextField fx:id="tf4" layoutX="45.0" layoutY="163.0" text="1000" />
       <TextField fx:id="tf5" layoutX="45.0" layoutY="200.0" text="30" />
-      <Button fx:id="button" layoutX="45.0" layoutY="271.0" mnemonicParsing="false" onAction="#handle" text="Submit" />
+      <Button fx:id="button" layoutX="45.0" layoutY="295.0" mnemonicParsing="false" onAction="#handle" text="Submit" />
       <Label layoutX="237.0" layoutY="52.0" text="Number of Decks" />
       <Label layoutX="231.0" layoutY="87.0" text="Min Bet" />
       <Label layoutX="232.0" layoutY="129.0" text="Max Bet" />
       <Label layoutX="232.0" layoutY="167.0" text="Starting Money" />
       <Label layoutX="237.0" layoutY="204.0" text="Hands played" />
-      <TextField fx:id="tf6" layoutX="45.0" layoutY="309.0" text="20" />
-      <Label layoutX="236.0" layoutY="313.0" text="No. of Simulations" />
-      <Button fx:id="playButton" layoutX="45.0" layoutY="342.0" mnemonicParsing="false" onAction="#handle2" text="Simulate" />
+      <TextField fx:id="tf6" layoutX="45.0" layoutY="251.0" text="20" />
+      <Label layoutX="235.0" layoutY="255.0" text="No. of Simulations" />
+      <Button fx:id="simButton" layoutX="45.0" layoutY="342.0" mnemonicParsing="false" onAction="#handle2" text="Simulate games" />
+      <Button fx:id="playBytton" layoutX="183.0" layoutY="342.0" mnemonicParsing="false" onAction="#handle3" text="Play one game" />
    </children>
 </AnchorPane>
