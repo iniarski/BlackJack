@@ -29,19 +29,19 @@ public class BlackjackUtil {
         // 9 : 10, J, Q and K
 
         byte score = 0;
-        byte hasAce = 1;
+        int hasAce = 1;
 
         for (byte n : cardRanks) {
 
             score += n + 1;
 
             // Since ace is stored as a 0 multiplying all elements of array will produce 0 only when there's an ace
-            hasAce = (byte) (hasAce * n);
+            hasAce = (hasAce * n);
         }
 
         // this way there's only one comparison in the function call
 
-        if (hasAce == 11 && score <= 11) {
+        if (hasAce == 0 && score <= 11) {
             score += 10;
         }
 
